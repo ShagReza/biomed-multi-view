@@ -1,12 +1,14 @@
-"""Generate stratified k-fold train/test indices for a CSV file.
+"""Generate stratified k-fold train/test indices for a CSV or parquet file.
 
 Uses scikit-learn's StratifiedKFold. Indices are 0-based row positions in the
-input CSV (header excluded), exactly as returned by StratifiedKFold.split().
+input file (header excluded), exactly as returned by StratifiedKFold.split().
+For a parquet file only the label column is read.
 
 Outputs (written to --output-dir, default: the input file's folder):
   cv_<k>fold_indices.npz   arrays fold<i>_train and fold<i>_test for each fold
   cv_<k>fold_assignment.csv  input rows plus a "fold" column: the fold in
-                             which each row is in the test set
+                             which each row is in the test set (for a parquet
+                             input: the label column plus "fold")
 
 Example:
   python stratified_cv.py sample.csv 5
@@ -22,19 +24,27 @@ import os
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 from sklearn.model_selection import StratifiedKFold
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("input_csv", help="CSV file to split")
+    parser.add_argument("input_csv", help="CSV or parquet file to split")
     parser.add_argument("n_folds", type=int, help="number of folds (k)")
     parser.add_argument("--label-col", default="label", help="column to stratify on (default: label)")
     parser.add_argument("--seed", type=int, default=42, help="random seed for shuffling (default: 42)")
     parser.add_argument("--output-dir", default=None, help="where to save outputs (default: input file's folder)")
     args = parser.parse_args()
 
-    df = pd.read_csv(args.input_csv)
+    if args.input_csv.lower().endswith((".parquet", ".pq")):
+        # Parquet files can hold many large columns (e.g. fingerprints): read only the label
+        columns = pq.ParquetFile(args.input_csv).schema_arrow.names
+        if args.label_col not in columns:
+            parser.error(f"label column '{args.label_col}' not found; columns are {columns}")
+        df = pd.read_parquet(args.input_csv, columns=[args.label_col])
+    else:
+        df = pd.read_csv(args.input_csv)
     if args.label_col not in df.columns:
         parser.error(f"label column '{args.label_col}' not found; columns are {list(df.columns)}")
 
