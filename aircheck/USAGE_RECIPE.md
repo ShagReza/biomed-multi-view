@@ -45,10 +45,6 @@ Single-view CV run folders are named `<RUN_NAME>_<VIEW>`.
 
 > **Warning:** if the embeddings come from a model fine-tuned on `train.parquet`, that model has already seen every training molecule's label. The LightGBM **CV numbers are then over-optimistic**; only the test result is valid. For a clean CV comparison, use the base model (`MODEL_PATH = None`).
 
-**Does fine-tuning help?** Run step 4 twice: once with the pretrained model (`MODEL_PATH = None`) and once with the
-single final model from step 2 (`MODEL_PATH` = its `best_model.ckpt`), with the same folds and LightGBM settings.
-The difference between the two test results shows what fine-tuning adds.
-
 ## 5. Report
 
 Collect the results into the report (see [report/report-sampledata.md](report/report-sampledata.md)):

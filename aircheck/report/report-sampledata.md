@@ -62,29 +62,12 @@ model (the single final model) and are scored as a fold ensemble.
 | LightGBM: image embeddings (fine-tuned) | fold ensemble | | | | | |
 | LightGBM: graph embeddings (fine-tuned) | fold ensemble | | | | | |
 
-## Final test results: without fine-tuning
-
-The pretrained MMELON model, with no fine-tuning: its embeddings feed a LightGBM classifier trained on the
-train set, scored as a fold ensemble. (A pretrained model has no prediction head for the target, so it needs a
-classifier trained on top.)
-
-| Model | Scored with | hit@200 | hit@100 | hit@50 | AUROC | PR AUC |
-|---|---|---|---|---|---|---|
-| LightGBM: fused embeddings (pretrained) | fold ensemble | | | | | |
-| LightGBM: text embeddings (pretrained) | fold ensemble | | | | | |
-| LightGBM: image embeddings (pretrained) | fold ensemble | | | | | |
-| LightGBM: graph embeddings (pretrained) | fold ensemble | | | | | |
-
-Both tables use the same LightGBM settings (`LGBM_PARAMS_CHOICE`: —) and folds, so comparing each LightGBM row
-with its fine-tuned counterpart shows what fine-tuning adds.
-
 For reference, a random ranking would place about K × (test active rate) actives in the top K.
 
 ## Observations
 
 - Best model on the final test set, and by how much.
 - Multi-view versus single views: does fusing the views help?
-- Does fine-tuning help: pretrained versus fine-tuned embeddings with the same LightGBM.
 - How close the CV estimates are to the test results.
 
 ## Caveats
