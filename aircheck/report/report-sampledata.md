@@ -49,8 +49,11 @@ One or two sentences: which model ranks actives best on the final test set (hit@
 | MMELON (multi-view) | fold ensemble | | | | | |
 | MMELON (multi-view) | single final model | | | | | |
 | Single view: text | fold ensemble | | | | | |
+| Single view: text | single final model | | | | | |
 | Single view: image | fold ensemble | | | | | |
+| Single view: image | single final model | | | | | |
 | Single view: graph | fold ensemble | | | | | |
+| Single view: graph | single final model | | | | | |
 | LightGBM: text embeddings | fold ensemble | | | | | |
 | LightGBM: image embeddings | fold ensemble | | | | | |
 | LightGBM: graph embeddings | fold ensemble | | | | | |
