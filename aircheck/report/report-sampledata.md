@@ -26,7 +26,7 @@ One or two sentences: which model ranks actives best on the final test set (hit@
 | Epochs (MMELON and single view) | |
 | Batch size, learning rate | |
 | Epoch selection | `SELECT_METRICS`: hit@200, then hit@100, hit@50, AUROC |
-| LightGBM | default hyperparameters; embeddings from: base model or fine-tuned model |
+| LightGBM | hyperparameters: default or suggested (`LGBM_PARAMS_CHOICE`); embeddings from: base model or fine-tuned model |
 | Hardware | CPU / GPU type |
 
 ## Cross-validation results (train, mean ± std over folds)
