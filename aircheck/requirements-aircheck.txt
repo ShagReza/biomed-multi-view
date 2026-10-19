@@ -1,0 +1,4 @@
+# Extra packages for the AIRCHECK notebooks, on top of the repository's own requirements.
+# Install after following ../README.md (and INSTALL.md if pytorch-fast-transformers fails):
+#   pip install -r aircheck/requirements-aircheck.txt
+lightgbm==4.7.0

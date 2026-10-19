@@ -1,10 +1,21 @@
-# Installation troubleshooting: `pytorch-fast-transformers`
+# Installation
+
+To run the AIRCHECK notebooks:
+
+1. Install the repository as described in the main [README](../README.md) (conda environment, `pip install -e .['dev']`, then `pip install -r requirements.txt`). If `pytorch-fast-transformers` fails to build, follow the [troubleshooting section](#troubleshooting-pytorch-fast-transformers) below.
+2. Install the extra packages the AIRCHECK notebooks use:
+   ```bash
+   pip install -r aircheck/requirements-aircheck.txt
+   ```
+3. Open a notebook in `aircheck/notebooks/` with that environment as the kernel, and run it from that folder (the default paths, like `../sample_data/train.parquet`, are relative to it).
+
+## Troubleshooting: `pytorch-fast-transformers`
 
 On some Linux machines, `pip install -r requirements.txt` from the main [README](../README.md) fails while building `pytorch-fast-transformers==0.4.0`. This page explains why and how to fix it.
 
 Don't skip the package. `bmfm_sm/predictive/modules/text_models.py` imports `fast_transformers`, so the text view (and the multi-view models that use it) will not load without it.
 
-## Who is affected
+### Who is affected
 
 You will likely hit this if any of the following is true:
 
@@ -13,7 +24,7 @@ You will likely hit this if any of the following is true:
 
 `pytorch-fast-transformers` has no prebuilt wheels, so pip compiles its C++/CUDA code locally. That compile has to use the same CUDA version as PyTorch (`torch==2.1.0` is built against CUDA 12.1) and a compiler that CUDA 12.1 supports.
 
-## Symptoms
+### Symptoms
 
 | Error in the pip output | Cause |
 |---|---|
@@ -23,7 +34,7 @@ You will likely hit this if any of the following is true:
 
 `--no-build-isolation` (used in `requirements-mps.txt`) does not fix any of these.
 
-## Fix
+### Fix
 
 The fix installs CUDA 12.1 and GCC 11 **inside your conda environment**, so your system CUDA and compiler are left untouched. You do not need a GPU on the machine to do this.
 
@@ -62,7 +73,7 @@ Expect the build to take 15 to 30 minutes, with long stretches of no new output.
 
 If you use micromamba instead of conda, replace `conda install` with `micromamba install`. `$CONDA_PREFIX` is set the same way once the environment is activated.
 
-## Verify
+### Verify
 
 ```bash
 python -c "from fast_transformers.causal_product import causal_product_cuda; import bmfm_sm.predictive.modules.text_models; print('OK')"
@@ -71,7 +82,7 @@ python -m unittest bmfm_sm.tests.all_tests
 
 The first command should print `OK`. On a machine without a GPU, it confirms the CUDA kernels were built even though they can't run there. The unit tests run on CPU.
 
-## Tested on
+### Tested on
 
 - Google Cloud Vertex AI Workbench, `e2-highmem-4` (no GPU), Debian 12, system CUDA 13.0, system GCC 12.2
 - Python 3.11, `torch==2.1.0+cu121`

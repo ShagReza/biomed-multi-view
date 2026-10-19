@@ -1,0 +1,4 @@
+# Models, embeddings, predictions and generated folds (large; recreated by the notebooks)
+output/
+# Fold files that stratified_cv.py writes next to its input by default
+sample_data/cv_*
