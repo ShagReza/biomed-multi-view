@@ -64,6 +64,14 @@ Each inference notebook writes `predictions.csv` (every molecule with its score 
 
 **Other tools.** `download_from_gcs.py` copies data from a GCP bucket to `~/Datasets`.
 
+## Class balancing
+
+With `BALANCE_CLASSES = True` (the default in the fine-tuning and LightGBM notebooks), label 1 is weighted by (number of 0s) / (number of 1s) in the loss, so both classes count equally while every negative is still used. The ratio is counted on the training rows only: per fold in CV, after `MAX_PER_CLASS` in the single-split notebooks. Set `False` for an unweighted loss.
+
+- **MMELON** passes it as `finetuning_args["class_weights"] = [[1.0, ratio]]`, an option of MMELON's `FineTuneLightningModule`. **LightGBM** uses `scale_pos_weight = ratio`, which replaces the fixed 8 in the `"suggested"` parameters.
+- The weights are printed with the fold summary and saved in `config.json` (and in the MMELON checkpoints).
+- Weighting raises the predicted scores. hit@K, AUROC and PR AUC depend only on the ranking, so compare weighted and unweighted runs with these. Precision, recall, specificity and accuracy at a 0.5 threshold, and MMELON's `loss` (also weighted), are not comparable between them.
+
 ## Notes
 
 - **Speed.** On CPU, MMELON takes roughly 0.25 s per molecule per model to score, and training is slow. A GPU makes it 10 to 50 times faster. The sample data is small so it runs on CPU.
