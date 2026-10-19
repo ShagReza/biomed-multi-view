@@ -42,7 +42,10 @@ One or two sentences: which model ranks actives best on the final test set (hit@
 | LightGBM: graph embeddings (pretrained) | n/a | | | | | |
 | LightGBM: fused embeddings (pretrained) | n/a | | | | | |
 
-## Final test results
+## Final test results: fine-tuned models
+
+All models here were fine-tuned on the train set. LightGBM rows use embeddings from the fine-tuned MMELON
+model (the single final model) and are scored as a fold ensemble.
 
 | Model | Scored with | hit@200 | hit@100 | hit@50 | AUROC | PR AUC |
 |---|---|---|---|---|---|---|
@@ -54,25 +57,28 @@ One or two sentences: which model ranks actives best on the final test set (hit@
 | Single view: image | single final model | | | | | |
 | Single view: graph | fold ensemble | | | | | |
 | Single view: graph | single final model | | | | | |
+| LightGBM: fused embeddings (fine-tuned) | fold ensemble | | | | | |
+| LightGBM: text embeddings (fine-tuned) | fold ensemble | | | | | |
+| LightGBM: image embeddings (fine-tuned) | fold ensemble | | | | | |
+| LightGBM: graph embeddings (fine-tuned) | fold ensemble | | | | | |
+
+## Final test results: without fine-tuning
+
+The pretrained MMELON model, with no fine-tuning: its embeddings feed a LightGBM classifier trained on the
+train set, scored as a fold ensemble. (A pretrained model has no prediction head for the target, so it needs a
+classifier trained on top.)
+
+| Model | Scored with | hit@200 | hit@100 | hit@50 | AUROC | PR AUC |
+|---|---|---|---|---|---|---|
+| LightGBM: fused embeddings (pretrained) | fold ensemble | | | | | |
+| LightGBM: text embeddings (pretrained) | fold ensemble | | | | | |
+| LightGBM: image embeddings (pretrained) | fold ensemble | | | | | |
+| LightGBM: graph embeddings (pretrained) | fold ensemble | | | | | |
+
+Both tables use the same LightGBM settings (`LGBM_PARAMS_CHOICE`: —) and folds, so comparing each LightGBM row
+with its fine-tuned counterpart shows what fine-tuning adds.
 
 For reference, a random ranking would place about K × (test active rate) actives in the top K.
-
-## Does fine-tuning help? (final test set)
-
-The same LightGBM classifier (`LGBM_PARAMS_CHOICE`: —) trained on embeddings from the **pretrained** MMELON model (no fine-tuning) and from the **fine-tuned** MMELON model (the single final model above), each scored as a fold ensemble. The only difference between each pair of rows is whether the encoders were fine-tuned on the train set.
-
-| Embedding | Encoder | hit@200 | hit@100 | hit@50 | AUROC | PR AUC |
-|---|---|---|---|---|---|---|
-| Fused (MMELON) | pretrained | | | | | |
-| Fused (MMELON) | fine-tuned | | | | | |
-| Text | pretrained | | | | | |
-| Text | fine-tuned | | | | | |
-| Image | pretrained | | | | | |
-| Image | fine-tuned | | | | | |
-| Graph | pretrained | | | | | |
-| Graph | fine-tuned | | | | | |
-
-Fine-tuning adds value where the fine-tuned row beats the pretrained one. For the end-to-end fine-tuned models themselves (encoder and head trained together), see the final test table above.
 
 ## Observations
 
