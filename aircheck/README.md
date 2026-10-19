@@ -14,13 +14,14 @@ The notebooks here fine-tune and evaluate MMELON for **hit identification**: bin
 ```
 aircheck/
 ├── README.md                    # this file
+├── USAGE_RECIPE.md              # step by step: which notebook to run when
 ├── INSTALL.md                   # setup, and a fix for the pytorch-fast-transformers build
 ├── requirements-aircheck.txt    # extra packages on top of the repository's own
 ├── sample_data/
 │   ├── train.parquet            # 600 molecules: ID, SMILES, LABEL, ECFP4
 │   └── test.parquet             # 200 molecules: the final test set for the inference notebooks
 ├── notebooks/                   # all notebooks and scripts
-├── report/                      # usage recipe and result reports
+├── report/                      # result reports
 └── output/                      # created by the notebooks; not tracked by git
 ```
 
@@ -30,7 +31,7 @@ aircheck/
 2. Open the notebooks in `notebooks/` and run them from that folder. Every notebook's default paths point at `sample_data/` and `output/`, so the steps below run end to end on the sample data without edits.
 3. For your own data, change the paths and column names in each notebook's first cell. Input files can be `.csv` or `.parquet`, and only the needed columns are read.
 
-For a short step-by-step guide to which notebook to run when, see the [usage recipe](report/USAGE_RECIPE.md).
+For a short step-by-step guide to which notebook to run when, see the [usage recipe](USAGE_RECIPE.md).
 
 ## Workflow
 

@@ -1,6 +1,6 @@
 # Report: sample data
 
-*Draft structure. Values are filled in after running the [usage recipe](USAGE_RECIPE.md).*
+*Draft structure. Values are filled in after running the [usage recipe](../USAGE_RECIPE.md).*
 
 ## Summary
 

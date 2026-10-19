@@ -4,7 +4,7 @@ How to go from a train and a test file to evaluated models, and which notebook t
 
 ## Before you start
 
-- Set up the environment once with [INSTALL.md](../INSTALL.md).
+- Set up the environment once with [INSTALL.md](INSTALL.md).
 - Put your data in its own folder outside the repository, for example `~/Datasets/<project>/`, so it is never committed:
   - `train.parquet`: used for cross-validation and training.
   - `test.parquet`: the **final test set**. Use it only in the inference steps, never to choose a model.
@@ -47,7 +47,7 @@ Single-view CV run folders are named `<RUN_NAME>_<VIEW>`.
 
 ## 5. Report
 
-Collect the results into the report (see [report-sampledata.md](report-sampledata.md)):
+Collect the results into the report (see [report/report-sampledata.md](report/report-sampledata.md)):
 
 | What | File |
 |---|---|
