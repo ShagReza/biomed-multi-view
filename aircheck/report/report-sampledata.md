@@ -37,10 +37,10 @@ One or two sentences: which model ranks actives best on the final test set (hit@
 | Single view: text | | | | | | |
 | Single view: image | | | | | | |
 | Single view: graph | | | | | | |
-| LightGBM: text embeddings | n/a | | | | | |
-| LightGBM: image embeddings | n/a | | | | | |
-| LightGBM: graph embeddings | n/a | | | | | |
-| LightGBM: fused embeddings | n/a | | | | | |
+| LightGBM: text embeddings (pretrained) | n/a | | | | | |
+| LightGBM: image embeddings (pretrained) | n/a | | | | | |
+| LightGBM: graph embeddings (pretrained) | n/a | | | | | |
+| LightGBM: fused embeddings (pretrained) | n/a | | | | | |
 
 ## Final test results
 
@@ -54,18 +54,31 @@ One or two sentences: which model ranks actives best on the final test set (hit@
 | Single view: image | single final model | | | | | |
 | Single view: graph | fold ensemble | | | | | |
 | Single view: graph | single final model | | | | | |
-| LightGBM: text embeddings | fold ensemble | | | | | |
-| LightGBM: image embeddings | fold ensemble | | | | | |
-| LightGBM: graph embeddings | fold ensemble | | | | | |
-| LightGBM: fused embeddings | fold ensemble | | | | | |
 
 For reference, a random ranking would place about K × (test active rate) actives in the top K.
+
+## Does fine-tuning help? (final test set)
+
+The same LightGBM classifier (`LGBM_PARAMS_CHOICE`: —) trained on embeddings from the **pretrained** MMELON model (no fine-tuning) and from the **fine-tuned** MMELON model (the single final model above), each scored as a fold ensemble. The only difference between each pair of rows is whether the encoders were fine-tuned on the train set.
+
+| Embedding | Encoder | hit@200 | hit@100 | hit@50 | AUROC | PR AUC |
+|---|---|---|---|---|---|---|
+| Fused (MMELON) | pretrained | | | | | |
+| Fused (MMELON) | fine-tuned | | | | | |
+| Text | pretrained | | | | | |
+| Text | fine-tuned | | | | | |
+| Image | pretrained | | | | | |
+| Image | fine-tuned | | | | | |
+| Graph | pretrained | | | | | |
+| Graph | fine-tuned | | | | | |
+
+Fine-tuning adds value where the fine-tuned row beats the pretrained one. For the end-to-end fine-tuned models themselves (encoder and head trained together), see the final test table above.
 
 ## Observations
 
 - Best model on the final test set, and by how much.
 - Multi-view versus single views: does fusing the views help?
-- Fine-tuning versus LightGBM on embeddings.
+- Does fine-tuning help: pretrained versus fine-tuned embeddings with the same LightGBM.
 - How close the CV estimates are to the test results.
 
 ## Caveats
