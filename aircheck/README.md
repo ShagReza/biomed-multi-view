@@ -18,8 +18,8 @@ aircheck/
 ├── INSTALL.md                   # setup, and a fix for the pytorch-fast-transformers build
 ├── requirements-aircheck.txt    # extra packages on top of the repository's own
 ├── sample_data/
-│   ├── train.parquet            # 600 molecules: ID, SMILES, LABEL, ECFP4
-│   └── test.parquet             # 200 molecules: the final test set for the inference notebooks
+│   ├── train.parquet            # 10,221 molecules (221 actives): ID, SMILES, LABEL, ECFP4
+│   └── test.parquet             # 1,031 molecules (31 actives): the final test set for the inference notebooks
 ├── notebooks/                   # all notebooks and scripts
 ├── report/                      # result reports
 └── output/                      # created by the notebooks; not tracked by git
@@ -80,4 +80,6 @@ With `BALANCE_CLASSES = True` (the default in the fine-tuning and LightGBM noteb
 
 ## Sample data
 
-`sample_data/` is a stratified random subset of the BACE dataset from MoleculeNet (Subramanian et al., *J. Chem. Inf. Model.* 2016; Wu et al., *Chem. Sci.* 2018): `LABEL` is BACE-1 inhibitor activity (1 = active), `ID` is the BACE compound ID, and `ECFP4` is a 2048-bit Morgan fingerprint (radius 2) from RDKit. Train and test share no molecules.
+`sample_data/` is a small random subset of an AIRCHECK **WDR91** ASMS screen: `LABEL` is 1 for a hit, `ID` is the row in the source file, and `ECFP4` is the 2048-bit ECFP4 fingerprint from the source (counts; the clustering uses them as bits). Both files come from the same screen and share no molecules. It is meant for checking that the notebooks run, not for benchmarking.
+
+The sample's training actives fall mostly in one chemical cluster, so `cluster_cv_folds.ipynb` builds a single fold from it with the default settings (the CV notebooks' defaults expect `train_cluster_cv_1fold_indices.npz`). With one fold, the CV result is that fold's score with no standard deviation, and the fold ensemble is a single model.
