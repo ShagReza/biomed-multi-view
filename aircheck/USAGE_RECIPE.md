@@ -11,7 +11,12 @@ How to go from a train and a test file to evaluated models, and which notebook t
 - Both files need a SMILES column and a 0/1 label column; `train.parquet` also needs an `ECFP4` column for step 1. CSV works too.
 - Steps 2 to 5 are independent of each other: run the ones you need.
 - Set the same **`DATASET`** name (first setting in every notebook) for all steps on one dataset. Every output then goes to
-  `aircheck/output/<DATASET>/`, and the default paths between notebooks line up.
+  `aircheck/output/<DATASET>/`, and the default paths between notebooks line up. Keep the default run names below,
+  so step 5 can find every result.
+- **Long runs:** start notebooks from a terminal with `aircheck/notebooks/run_notebook.sh <notebook> [<notebook> ...]`
+  (environment active). They run in the background, one after another, and keep going if VS Code disconnects (not if
+  the VM shuts down). Follow them with `tail -f aircheck/output/notebook_runs/<time>_run.log`; CV runs also write
+  `progress.log` in their run folder.
 
 ## 1. Make the folds
 
@@ -41,16 +46,27 @@ Single-view CV run folders are named `<RUN_NAME>_<VIEW>`.
 
 ## 4. LightGBM on MMELON embeddings
 
-1. **`MMELON_embedding_extraction.ipynb`**, run twice: once on `train_cluster_cv_data.csv` and once on `test.parquet`, each with its own `EMBEDDING_NAME`.
-   - Use **the same model** both times. `MODEL_PATH = None` uses the pretrained base model.
-2. **`MMELON_embedding_lgbm_cv.ipynb`**: CV with the train embeddings and the same folds as step 1. Set `VIEW`.
-3. **`MMELON_embedding_lgbm_inference.ipynb`**: scores the test embeddings with the fold models.
+1. **`MMELON_embedding_extraction.ipynb`**, run twice: once on `train_cluster_cv_data.csv` and once on `test.parquet`.
+   Use **the same model** both times, and set `VIEWS = ["text", "image", "graph", "fused"]` to get all four views.
+2. **`MMELON_embedding_lgbm_cv.ipynb`**: CV with the train embeddings and the same folds as step 1, once per `VIEW`.
+3. **`MMELON_embedding_lgbm_inference.ipynb`**: scores the test embeddings with the fold models, once per LightGBM run.
+
+Names to use (so step 5 finds the results):
+
+| Embeddings from | `MODEL_PATH` | `EMBEDDING_NAME` (train, test) | LightGBM `RUN_NAME` |
+|---|---|---|---|
+| Pretrained model (CV table) | `None` | `train-pretrained`, `test-pretrained` | `lgbm-<view>-pretrained` |
+| Single final MMELON model (test table) | its `best_model.ckpt` | `train-finetuned`, `test-finetuned` | `lgbm-<view>-finetuned` |
 
 > **Warning:** if the embeddings come from a model fine-tuned on `train.parquet`, that model has already seen every training molecule's label. The LightGBM **CV numbers are then over-optimistic**; only the test result is valid. For a clean CV comparison, use the base model (`MODEL_PATH = None`).
 
 ## 5. Report
 
-Collect the results into the report (see [report/report-sampledata.md](report/report-sampledata.md)):
+**`collect_results.ipynb`**: set `DATASET` and the train and test paths. It reads every run under
+`aircheck/output/<DATASET>/` and writes the report tables to `aircheck/report/report-<DATASET>.md` (runs not done yet
+show as "—"). Write the Summary and Observations last: rerunning the notebook regenerates the file.
+
+Where each number comes from:
 
 | What | File |
 |---|---|

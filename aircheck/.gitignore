@@ -2,3 +2,5 @@
 output/
 # Fold files that stratified_cv.py writes next to its input by default
 sample_data/cv_*
+# The repository's root .gitignore ignores *.sh; keep our notebook runner
+!notebooks/run_notebook.sh
