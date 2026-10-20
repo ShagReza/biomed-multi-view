@@ -4,3 +4,5 @@ output/
 sample_data/cv_*
 # The repository's root .gitignore ignores *.sh; keep our notebook runner
 !notebooks/run_notebook.sh
+# Temporary copies run_recipe.py makes while a step runs
+notebooks/.recipe_*
