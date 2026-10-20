@@ -19,7 +19,8 @@
     "rocauc": 0.7763080596923828,
     "precision": 0.11764705926179886,
     "recall": 0.5799999833106995,
-    "specificity": 0.8259999752044678
+    "specificity": 0.8259999752044678,
+    "pr_auc": 0.14865944779796414
   },
   "std": {
     "hit@200": NaN,
@@ -29,7 +30,8 @@
     "rocauc": NaN,
     "precision": NaN,
     "recall": NaN,
-    "specificity": NaN
+    "specificity": NaN,
+    "pr_auc": NaN
   },
   "per_fold": {
     "hit@200": {
@@ -55,9 +57,13 @@
     },
     "specificity": {
       "0": 0.8259999752044678
+    },
+    "pr_auc": {
+      "0": 0.14865944779796414
     }
   },
   "models": [
     "~/repos/biomed-multi-view/aircheck/output/sample-data/singleview-cv_graph/fold_0/best_model.ckpt"
-  ]
+  ],
+  "note": "pr_auc added after training by scoring each fold's best model on its validation rows (same batches as training)"
 }
