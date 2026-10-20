@@ -1,0 +1,12 @@
+{
+  "model": "base: ibm-research/biomed.sm.mv-te-84m",
+  "data_path": "~/repos/biomed-multi-view/aircheck/sample_data/test.parquet",
+  "smiles_col": "SMILES",
+  "views": [
+    "text",
+    "image",
+    "graph",
+    "fused"
+  ],
+  "chunk_size": 1000
+}

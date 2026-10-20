@@ -1,0 +1,2 @@
+fold,hit@200,hit@100,hit@50,rocauc,pr_auc,precision,recall,specificity,accuracy
+0,30,17,13,0.6902719999999999,0.14783785045927444,0.5,0.05,0.998,0.9615384615384616

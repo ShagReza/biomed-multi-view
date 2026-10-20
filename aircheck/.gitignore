@@ -6,3 +6,5 @@ sample_data/cv_*
 !notebooks/run_notebook.sh
 # Temporary copies run_recipe.py makes while a step runs
 notebooks/.recipe_*
+# Logs in the committed example output (the root .gitignore ignores *.log)
+!sample_output/**/*.log

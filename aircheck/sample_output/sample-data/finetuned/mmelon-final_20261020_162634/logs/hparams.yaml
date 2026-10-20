@@ -1,0 +1,20 @@
+base_model_class: bmfm_sm.predictive.modules.smmv_model.SmallMoleculeMultiView
+model_params:
+  agg_arch: coeff_mlp
+  agg_gate_input: coeff_mlp
+  agg_weight_freeze: null
+  inference_mode: false
+task_type: classification
+num_tasks: 1
+checkpoint_path: null
+lr: 2.0e-05
+weight_decay: 0.01
+finetuning_args:
+  weight_freeze: unfrozen
+  initialization: default
+  head_arch: mlp
+  use_norm: true
+  head_dropout: 0.2
+  class_weights:
+  - - 1.0
+    - 45.2489

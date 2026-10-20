@@ -1,0 +1,34 @@
+{
+  "data_path": "../output/sample-data/cv_folds/train_cluster_cv_data.csv",
+  "cv_indices_path": "../output/sample-data/cv_folds/train_cluster_cv_folds.npz",
+  "n_folds": 1,
+  "smiles_col": "SMILES",
+  "label_col": "LABEL",
+  "base_model": "ibm-research/biomed.sm.mv-te-84m",
+  "epochs": 50,
+  "patience": 5,
+  "batch_size": 16,
+  "learning_rate": 2e-05,
+  "weight_decay": 0.01,
+  "seed": 42,
+  "hit_ks": [
+    200,
+    100,
+    50
+  ],
+  "select_metrics": [
+    "hit@200",
+    "hit@100",
+    "hit@50",
+    "rocauc"
+  ],
+  "balance_classes": true,
+  "class_weights_per_fold": [
+    [
+      [
+        1.0,
+        83.3333
+      ]
+    ]
+  ]
+}

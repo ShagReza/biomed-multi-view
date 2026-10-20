@@ -137,7 +137,12 @@ def main():
         print(f"\n{len(steps)} steps; all settings found in their notebooks. Outputs: {OUTPUT / a.dataset}")
         return
 
-    run_dir = Path(a.resume) if a.resume else OUTPUT / a.dataset / "recipe_runs" / time.strftime("%Y%m%d_%H%M%S")
+    # Absolute paths: the background process runs from the notebooks folder
+    run_dir = (Path(a.resume).expanduser().resolve() if a.resume
+               else OUTPUT / a.dataset / "recipe_runs" / time.strftime("%Y%m%d_%H%M%S"))
+    if a.resume:
+        assert (run_dir / "recipe.log").exists(), f"Not a recipe run folder: {run_dir}"
+    a.train, a.test = (str(Path(f).expanduser().resolve()) for f in (a.train, a.test))
     run_dir.mkdir(parents=True, exist_ok=True)
     log_path = run_dir / "recipe.log"
     if not a.foreground:  # detach, so the run survives a closed terminal or VS Code disconnect

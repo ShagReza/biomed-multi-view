@@ -1,0 +1,24 @@
+{
+  "select_metrics": [
+    "hit@200",
+    "hit@100",
+    "hit@50",
+    "rocauc"
+  ],
+  "best_epoch": 5,
+  "epochs_trained": 6,
+  "max_epochs": 6,
+  "patience": 6,
+  "stopped_early": false,
+  "test_metrics": {
+    "hit@200": 20.0,
+    "hit@100": 14.0,
+    "hit@50": 11.0,
+    "loss": 1.324768304824829,
+    "precision": 0.0557851232588291,
+    "recall": 0.8709677457809448,
+    "rocauc": 0.7983871102333069,
+    "specificity": 0.5429999828338623
+  },
+  "model": "~/repos/biomed-multi-view/aircheck/output/sample-data/finetuned/singleview-final_text_20261020_164954/best_model.ckpt"
+}

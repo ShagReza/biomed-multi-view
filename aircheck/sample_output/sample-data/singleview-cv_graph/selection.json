@@ -1,0 +1,63 @@
+{
+  "select_metrics": [
+    "hit@200",
+    "hit@100",
+    "hit@50",
+    "rocauc"
+  ],
+  "best_epoch": 1,
+  "epochs_trained": 7,
+  "max_epochs": 50,
+  "patience": 5,
+  "stopped_early": true,
+  "n_folds": 1,
+  "mean": {
+    "hit@200": 41.0,
+    "hit@100": 22.0,
+    "hit@50": 10.0,
+    "loss": 2.7658960819244385,
+    "rocauc": 0.7763080596923828,
+    "precision": 0.11764705926179886,
+    "recall": 0.5799999833106995,
+    "specificity": 0.8259999752044678
+  },
+  "std": {
+    "hit@200": NaN,
+    "hit@100": NaN,
+    "hit@50": NaN,
+    "loss": NaN,
+    "rocauc": NaN,
+    "precision": NaN,
+    "recall": NaN,
+    "specificity": NaN
+  },
+  "per_fold": {
+    "hit@200": {
+      "0": 41.0
+    },
+    "hit@100": {
+      "0": 22.0
+    },
+    "hit@50": {
+      "0": 10.0
+    },
+    "loss": {
+      "0": 2.7658960819244385
+    },
+    "rocauc": {
+      "0": 0.7763080596923828
+    },
+    "precision": {
+      "0": 0.11764705926179886
+    },
+    "recall": {
+      "0": 0.5799999833106995
+    },
+    "specificity": {
+      "0": 0.8259999752044678
+    }
+  },
+  "models": [
+    "~/repos/biomed-multi-view/aircheck/output/sample-data/singleview-cv_graph/fold_0/best_model.ckpt"
+  ]
+}

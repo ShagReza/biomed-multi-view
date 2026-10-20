@@ -1,0 +1,22 @@
+{
+  "embedding_dir": "~/repos/biomed-multi-view/aircheck/output/sample-data/embeddings/train-pretrained",
+  "view": "text",
+  "embedding_model": "base: ibm-research/biomed.sm.mv-te-84m",
+  "data_path": "../output/sample-data/cv_folds/train_cluster_cv_data.csv",
+  "cv_indices_path": "../output/sample-data/cv_folds/train_cluster_cv_folds.npz",
+  "smiles_col": "SMILES",
+  "label_col": "LABEL",
+  "seed": 42,
+  "threshold": 0.5,
+  "hit_ks": [
+    200,
+    100,
+    50
+  ],
+  "balance_classes": true,
+  "lgbm_params_choice": "default",
+  "lgbm_params": {},
+  "scale_pos_weight_per_fold": [
+    83.3333
+  ]
+}

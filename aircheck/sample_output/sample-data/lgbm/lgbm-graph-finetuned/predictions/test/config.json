@@ -1,0 +1,18 @@
+{
+  "lgbm_run_dir": "~/repos/biomed-multi-view/aircheck/output/sample-data/lgbm/lgbm-graph-finetuned",
+  "models": [
+    "~/repos/biomed-multi-view/aircheck/output/sample-data/lgbm/lgbm-graph-finetuned/models/fold_0.txt"
+  ],
+  "view": "graph",
+  "embedding_dir": "~/repos/biomed-multi-view/aircheck/output/sample-data/embeddings/test-finetuned",
+  "embedding_model": "~/repos/biomed-multi-view/aircheck/output/sample-data/finetuned/mmelon-final_20261020_162634/best_model.ckpt",
+  "data_path": "~/repos/biomed-multi-view/aircheck/sample_data/test.parquet",
+  "smiles_col": "SMILES",
+  "label_col": "LABEL",
+  "threshold": 0.5,
+  "hit_ks": [
+    200,
+    100,
+    50
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "model": "~/repos/biomed-multi-view/aircheck/output/sample-data/finetuned/mmelon-final_20261020_162634/best_model.ckpt",
+  "data_path": "~/repos/biomed-multi-view/aircheck/output/sample-data/cv_folds/train_cluster_cv_data.csv",
+  "smiles_col": "SMILES",
+  "views": [
+    "text",
+    "image",
+    "graph",
+    "fused"
+  ],
+  "chunk_size": 1000
+}

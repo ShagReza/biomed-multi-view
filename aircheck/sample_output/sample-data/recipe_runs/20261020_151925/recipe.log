@@ -1,0 +1,135 @@
+2026-10-20 15:19:26  Recipe on DATASET=sample-data: 34 steps (0 already done)
+2026-10-20 15:19:26  [1/34] START folds (cluster_cv_folds.ipynb)
+2026-10-20 15:19:32  [1/34] DONE  folds in 0.1 min
+2026-10-20 15:19:32  [2/34] START mmelon_cv (MMELON_finetuning_cv.ipynb)
+2026-10-20 15:52:24  [2/34] DONE  mmelon_cv in 32.9 min
+2026-10-20 15:52:24  [3/34] START mmelon_cv_test (MMELON_inference_cv.ipynb)
+2026-10-20 15:54:11  [3/34] DONE  mmelon_cv_test in 1.8 min
+2026-10-20 15:54:11  [4/34] START singleview_cv_text (MMELON_singleview_finetuning_cv.ipynb)
+2026-10-20 16:06:35  [4/34] DONE  singleview_cv_text in 12.4 min
+2026-10-20 16:06:35  [5/34] START singleview_cv_text_test (MMELON_singleview_inference_cv.ipynb)
+2026-10-20 16:08:14  [5/34] DONE  singleview_cv_text_test in 1.6 min
+2026-10-20 16:08:14  [6/34] START singleview_cv_image (MMELON_singleview_finetuning_cv.ipynb)
+2026-10-20 16:13:49  [6/34] DONE  singleview_cv_image in 5.6 min
+2026-10-20 16:13:49  [7/34] START singleview_cv_image_test (MMELON_singleview_inference_cv.ipynb)
+2026-10-20 16:15:26  [7/34] DONE  singleview_cv_image_test in 1.6 min
+2026-10-20 16:15:26  [8/34] START singleview_cv_graph (MMELON_singleview_finetuning_cv.ipynb)
+2026-10-20 16:24:50  [8/34] DONE  singleview_cv_graph in 9.4 min
+2026-10-20 16:24:50  [9/34] START singleview_cv_graph_test (MMELON_singleview_inference_cv.ipynb)
+2026-10-20 16:26:29  [9/34] DONE  singleview_cv_graph_test in 1.6 min
+2026-10-20 16:26:29  [10/34] START mmelon_final (MMELON_finetuning.ipynb)
+2026-10-20 16:48:02  [10/34] DONE  mmelon_final in 21.6 min
+2026-10-20 16:48:02  [11/34] START mmelon_final_test (MMELON_inference.ipynb)
+2026-10-20 16:49:49  [11/34] DONE  mmelon_final_test in 1.8 min
+2026-10-20 16:49:49  [12/34] START singleview_final_text (MMELON_singleview_finetuning.ipynb)
+2026-10-20 16:58:02  [12/34] DONE  singleview_final_text in 8.2 min
+2026-10-20 16:58:02  [13/34] START singleview_final_text_test (MMELON_singleview_inference.ipynb)
+2026-10-20 16:59:41  [13/34] DONE  singleview_final_text_test in 1.6 min
+2026-10-20 16:59:41  [14/34] START singleview_final_image (MMELON_singleview_finetuning.ipynb)
+2026-10-20 17:02:33  [14/34] DONE  singleview_final_image in 2.9 min
+2026-10-20 17:02:33  [15/34] START singleview_final_image_test (MMELON_singleview_inference.ipynb)
+2026-10-20 17:04:10  [15/34] DONE  singleview_final_image_test in 1.6 min
+2026-10-20 17:04:10  [16/34] START singleview_final_graph (MMELON_singleview_finetuning.ipynb)
+2026-10-20 17:07:39  [16/34] DONE  singleview_final_graph in 3.5 min
+2026-10-20 17:07:39  [17/34] START singleview_final_graph_test (MMELON_singleview_inference.ipynb)
+2026-10-20 17:09:18  [17/34] DONE  singleview_final_graph_test in 1.6 min
+2026-10-20 17:09:18  [18/34] START embeddings_train_pretrained (MMELON_embedding_extraction.ipynb)
+2026-10-20 17:11:09  [18/34] DONE  embeddings_train_pretrained in 1.8 min
+2026-10-20 17:11:09  [19/34] START embeddings_test_pretrained (MMELON_embedding_extraction.ipynb)
+2026-10-20 19:39:23  Recipe on DATASET=sample-data: 34 steps (0 already done)
+2026-10-20 19:39:24  [1/34] START folds (cluster_cv_folds.ipynb)
+2026-10-20 19:39:34  [1/34] DONE  folds in 0.2 min
+2026-10-20 19:39:34  [2/34] START mmelon_cv (MMELON_finetuning_cv.ipynb)
+2026-10-20 19:39:45  [2/34] FAILED mmelon_cv; the executed copy shows the error: aircheck/output/sample-data/recipe_runs/20261020_151925/02_mmelon_cv.ipynb
+ inside the biomed-multi-view repo (cwd={start})")
+
+
+REPO_ROOT = find_repo_root(Path.cwd().resolve())
+OUTPUT_DIR = REPO_ROOT / "aircheck" / "output"
+BASE_MODEL_DIR = OUTPUT_DIR / "base_models" / BASE_MODEL.split("/")[-1]
+RUN_DIR = OUTPUT_DIR / DATASET / RUN_NAME
+
+for path in (DATA_PATH, CV_INDICES_PATH):
+    assert Path(path).exists(), f"File not found: {path}"
+assert not (RUN_DIR.exists() and any(RUN_DIR.iterdir())), (
+    f"{RUN_DIR} already exists. Choose a new RUN_NAME or delete that folder."
+)
+
+# ── Fold indices ──────────────────────────────────────────────────────────────
+cv_indices = np.load(CV_INDICES_PATH)
+N_FOLDS = len([k for k in cv_indices.files if k.endswith("_train")])
+folds = [(cv_indices[f"fold{i}_train"], cv_indices[f"fold{i}_test"]) for i in range(N_FOLDS)]
+for i, (train_idx, test_idx) in enumerate(folds):
+    assert not np.intersect1d(train_idx, test_idx).size, f"fold {i}: train and test rows overlap"
+
+# Each fold keeps its latest training state (weights + optimizer, ~1 GB) and its best model (~0.35 GB)
+needed_gb = 1.4 * N_FOLDS
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+free_gb = shutil.disk_usage(OUTPUT_DIR).free / 1e9
+assert free_gb > needed_gb + 2, f"Need ~{needed_gb:.0f} GB free for checkpoints, only {free_gb:.0f} GB available"
+
+RUN_DIR.mkdir(parents=True, exist_ok=True)
+config = dict(
+    data_path=str(DATA_PATH), cv_indices_path=str(CV_INDICES_PATH), n_folds=N_FOLDS,
+    smiles_col=SMILES_COL, label_col=LABEL_COL, base_model=BASE_MODEL, epochs=EPOCHS, patience=PATIENCE,
+    batch_size=BATCH_SIZE, learning_rate=LEARNING_RATE, weight_decay=WEIGHT_DECAY,
+    seed=SEED, hit_ks=HIT_KS, select_metrics=SELECT_METRICS, balance_classes=BALANCE_CLASSES,
+)
+(RUN_DIR / "config.json").write_text(json.dumps(config, indent=2))
+
+print(f"Folds      : {N_FOLDS} (from {CV_INDICES_PATH.name})")
+print(f"Run folder : {RUN_DIR}")
+print(f"Disk       : ~{needed_gb:.1f} GB needed during training, {free_gb:.0f} GB free")
+print(f"Device     : {'GPU' if torch.cuda.is_available() else 'CPU (training will be slow)'}")
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mAssertionError[39m                            Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 23[39m
+[32m     19[39m RUN_DIR = OUTPUT_DIR / DATASET / RUN_NAME
+[32m     20[39m 
+[32m     21[39m [38;5;28;01mfor[39;00m path [38;5;28;01min[39;00m (DATA_PATH, CV_INDICES_PATH):
+[32m     22[39m     [38;5;28;01massert[39;00m Path(path).exists(), [33mf"File not found: {path}"[39m
+[32m---> [39m[32m23[39m assert not (RUN_DIR.exists() and any(RUN_DIR.iterdir())), (
+[32m     24[39m     [33mf"{RUN_DIR} already exists. Choose a new RUN_NAME or delete that folder."[39m
+[32m     25[39m )
+[32m     26[39m 
+
+[31mAssertionError[39m: ~/repos/biomed-multi-view/aircheck/output/sample-data/mmelon-cv already exists. Choose a new RUN_NAME or delete that folder.
+
+
+2026-10-20 19:41:16  Recipe on DATASET=sample-data: 34 steps (18 already done)
+2026-10-20 19:41:16  [19/34] START embeddings_test_pretrained (MMELON_embedding_extraction.ipynb)
+2026-10-20 19:41:52  [19/34] DONE  embeddings_test_pretrained in 0.6 min
+2026-10-20 19:41:52  [20/34] START lgbm_cv_fused_pretrained (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:41:58  [20/34] DONE  lgbm_cv_fused_pretrained in 0.1 min
+2026-10-20 19:41:58  [21/34] START lgbm_cv_text_pretrained (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:42:06  [21/34] DONE  lgbm_cv_text_pretrained in 0.1 min
+2026-10-20 19:42:06  [22/34] START lgbm_cv_image_pretrained (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:42:12  [22/34] DONE  lgbm_cv_image_pretrained in 0.1 min
+2026-10-20 19:42:12  [23/34] START lgbm_cv_graph_pretrained (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:42:18  [23/34] DONE  lgbm_cv_graph_pretrained in 0.1 min
+2026-10-20 19:42:18  [24/34] START embeddings_train_finetuned (MMELON_embedding_extraction.ipynb)
+2026-10-20 19:44:01  [24/34] DONE  embeddings_train_finetuned in 1.7 min
+2026-10-20 19:44:01  [25/34] START embeddings_test_finetuned (MMELON_embedding_extraction.ipynb)
+2026-10-20 19:44:26  [25/34] DONE  embeddings_test_finetuned in 0.4 min
+2026-10-20 19:44:26  [26/34] START lgbm_cv_fused_finetuned (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:44:32  [26/34] DONE  lgbm_cv_fused_finetuned in 0.1 min
+2026-10-20 19:44:32  [27/34] START lgbm_fused_finetuned_test (MMELON_embedding_lgbm_inference.ipynb)
+2026-10-20 19:44:37  [27/34] DONE  lgbm_fused_finetuned_test in 0.1 min
+2026-10-20 19:44:37  [28/34] START lgbm_cv_text_finetuned (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:44:44  [28/34] DONE  lgbm_cv_text_finetuned in 0.1 min
+2026-10-20 19:44:44  [29/34] START lgbm_text_finetuned_test (MMELON_embedding_lgbm_inference.ipynb)
+2026-10-20 19:44:49  [29/34] DONE  lgbm_text_finetuned_test in 0.1 min
+2026-10-20 19:44:49  [30/34] START lgbm_cv_image_finetuned (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:44:55  [30/34] DONE  lgbm_cv_image_finetuned in 0.1 min
+2026-10-20 19:44:55  [31/34] START lgbm_image_finetuned_test (MMELON_embedding_lgbm_inference.ipynb)
+2026-10-20 19:45:00  [31/34] DONE  lgbm_image_finetuned_test in 0.1 min
+2026-10-20 19:45:00  [32/34] START lgbm_cv_graph_finetuned (MMELON_embedding_lgbm_cv.ipynb)
+2026-10-20 19:45:06  [32/34] DONE  lgbm_cv_graph_finetuned in 0.1 min
+2026-10-20 19:45:06  [33/34] START lgbm_graph_finetuned_test (MMELON_embedding_lgbm_inference.ipynb)
+2026-10-20 19:45:11  [33/34] DONE  lgbm_graph_finetuned_test in 0.1 min
+2026-10-20 19:45:11  [34/34] START report (collect_results.ipynb)
+2026-10-20 19:45:17  [34/34] DONE  report in 0.1 min
+2026-10-20 19:45:17  ALL DONE in 0.1 h. Report: ~/repos/biomed-multi-view/aircheck/report/report-sample-data.md

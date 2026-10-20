@@ -1,0 +1,17 @@
+base_model_class: bmfm_sm.predictive.modules.graph_2d_models.Graph2dModel
+model_params:
+  encoder_embed_dim: 512
+task_type: classification
+num_tasks: 1
+checkpoint_path: null
+lr: 2.0e-05
+weight_decay: 0.01
+finetuning_args:
+  weight_freeze: unfrozen
+  initialization: default
+  head_arch: mlp
+  use_norm: true
+  head_dropout: 0.2
+  class_weights:
+  - - 1.0
+    - 45.2489

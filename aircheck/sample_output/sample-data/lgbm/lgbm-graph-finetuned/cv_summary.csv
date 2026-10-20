@@ -1,0 +1,10 @@
+metric,mean,std
+hit@200,13.0,
+hit@100,8.0,
+hit@50,5.0,
+rocauc,0.564564,
+pr_auc,0.056436637361405875,
+precision,0.25,
+recall,0.01,
+specificity,0.9988,
+accuracy,0.9607692307692308,

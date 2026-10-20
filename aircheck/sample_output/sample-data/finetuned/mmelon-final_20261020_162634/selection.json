@@ -1,0 +1,24 @@
+{
+  "select_metrics": [
+    "hit@200",
+    "hit@100",
+    "hit@50",
+    "rocauc"
+  ],
+  "best_epoch": 3,
+  "epochs_trained": 6,
+  "max_epochs": 6,
+  "patience": 6,
+  "stopped_early": false,
+  "test_metrics": {
+    "hit@200": 23.0,
+    "hit@100": 13.0,
+    "hit@50": 10.0,
+    "loss": 1.305955171585083,
+    "precision": 0.1036036014556884,
+    "recall": 0.7419354915618896,
+    "rocauc": 0.8264193534851074,
+    "specificity": 0.8009999990463257
+  },
+  "model": "~/repos/biomed-multi-view/aircheck/output/sample-data/finetuned/mmelon-final_20261020_162634/best_model.ckpt"
+}

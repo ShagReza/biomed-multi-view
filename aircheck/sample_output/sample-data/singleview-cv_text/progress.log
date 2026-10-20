@@ -1,0 +1,25 @@
+2026-10-20 15:54:23  Training 1 folds side by side, up to 50 epochs (patience 5)
+2026-10-20 15:55:30  epoch 0, fold 1/1 done in 1.1 min
+2026-10-20 15:55:30  epoch   0 mean over folds:  hit@200 41.0000  hit@100 23.0000  hit@50 15.0000  rocauc 0.8520  -> best so far, models saved
+2026-10-20 15:56:36  epoch 1, fold 1/1 done in 1.1 min
+2026-10-20 15:56:36  epoch   1 mean over folds:  hit@200 22.0000  hit@100 6.0000  hit@50 2.0000  rocauc 0.8414  -> no improvement (1/5)
+2026-10-20 15:57:42  epoch 2, fold 1/1 done in 1.1 min
+2026-10-20 15:57:43  epoch   2 mean over folds:  hit@200 44.0000  hit@100 30.0000  hit@50 13.0000  rocauc 0.8628  -> best so far, models saved
+2026-10-20 15:58:49  epoch 3, fold 1/1 done in 1.1 min
+2026-10-20 15:58:49  epoch   3 mean over folds:  hit@200 30.0000  hit@100 16.0000  hit@50 4.0000  rocauc 0.8535  -> no improvement (1/5)
+2026-10-20 15:59:55  epoch 4, fold 1/1 done in 1.1 min
+2026-10-20 15:59:55  epoch   4 mean over folds:  hit@200 41.0000  hit@100 21.0000  hit@50 9.0000  rocauc 0.8545  -> no improvement (2/5)
+2026-10-20 16:01:01  epoch 5, fold 1/1 done in 1.1 min
+2026-10-20 16:01:02  epoch   5 mean over folds:  hit@200 45.0000  hit@100 21.0000  hit@50 11.0000  rocauc 0.8581  -> best so far, models saved
+2026-10-20 16:02:08  epoch 6, fold 1/1 done in 1.1 min
+2026-10-20 16:02:08  epoch   6 mean over folds:  hit@200 44.0000  hit@100 30.0000  hit@50 12.0000  rocauc 0.8599  -> no improvement (1/5)
+2026-10-20 16:03:14  epoch 7, fold 1/1 done in 1.1 min
+2026-10-20 16:03:15  epoch   7 mean over folds:  hit@200 43.0000  hit@100 27.0000  hit@50 24.0000  rocauc 0.8632  -> no improvement (2/5)
+2026-10-20 16:04:21  epoch 8, fold 1/1 done in 1.1 min
+2026-10-20 16:04:21  epoch   8 mean over folds:  hit@200 42.0000  hit@100 30.0000  hit@50 20.0000  rocauc 0.8549  -> no improvement (3/5)
+2026-10-20 16:05:27  epoch 9, fold 1/1 done in 1.1 min
+2026-10-20 16:05:27  epoch   9 mean over folds:  hit@200 44.0000  hit@100 28.0000  hit@50 21.0000  rocauc 0.8513  -> no improvement (4/5)
+2026-10-20 16:06:33  epoch 10, fold 1/1 done in 1.1 min
+2026-10-20 16:06:33  epoch  10 mean over folds:  hit@200 40.0000  hit@100 28.0000  hit@50 20.0000  rocauc 0.8517  -> no improvement (5/5)
+2026-10-20 16:06:33  Stopping early: no improvement of the fold average for 5 epochs
+2026-10-20 16:06:33  Done: selected epoch 5 after 11 epochs

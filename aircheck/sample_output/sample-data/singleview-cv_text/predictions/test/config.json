@@ -1,0 +1,17 @@
+{
+  "cv_run_dir": "~/repos/biomed-multi-view/aircheck/output/sample-data/singleview-cv_text",
+  "n_folds": 1,
+  "models": [
+    "~/repos/biomed-multi-view/aircheck/output/sample-data/singleview-cv_text/fold_0/best_model.ckpt"
+  ],
+  "data_path": "~/repos/biomed-multi-view/aircheck/sample_data/test.parquet",
+  "smiles_col": "SMILES",
+  "label_col": "LABEL",
+  "threshold": 0.5,
+  "hit_ks": [
+    200,
+    100,
+    50
+  ],
+  "view": "text"
+}

@@ -1,0 +1,32 @@
+{
+  "train_path": "~/repos/biomed-multi-view/aircheck/sample_data/train.parquet",
+  "test_path": "~/repos/biomed-multi-view/aircheck/sample_data/test.parquet",
+  "smiles_col": "SMILES",
+  "label_col": "LABEL",
+  "base_model": "ibm-research/biomed.sm.mv-te-84m",
+  "epochs": 6,
+  "patience": 6,
+  "batch_size": 16,
+  "learning_rate": 2e-05,
+  "weight_decay": 0.01,
+  "seed": 42,
+  "hit_ks": [
+    200,
+    100,
+    50
+  ],
+  "select_metrics": [
+    "hit@200",
+    "hit@100",
+    "hit@50",
+    "rocauc"
+  ],
+  "balance_classes": true,
+  "max_per_class": null,
+  "class_weights": [
+    [
+      1.0,
+      45.2489
+    ]
+  ]
+}
