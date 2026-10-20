@@ -64,7 +64,7 @@ Names to use (so step 5 finds the results):
 
 **`collect_results.ipynb`**: set `DATASET` and the train and test paths. It reads every run under
 `aircheck/output/<DATASET>/` and writes the report tables to `aircheck/report/report-<DATASET>.md` (runs not done yet
-show as "—"). Write the Summary and Observations last: rerunning the notebook regenerates the file.
+show as "—"). Write the Summary last: rerunning the notebook regenerates the file.
 
 Where each number comes from:
 

@@ -37,38 +37,31 @@ For a short step-by-step guide to which notebook to run when, see the [usage rec
 
 To see what each step produces without running anything, look at `sample_output/sample-data/`: the outputs of the full recipe on the sample data, including every notebook's executed copy with its outputs (`recipe_runs/`) and the resulting [report](report/report-sample-data.md). Model checkpoints and embedding files are left out to keep it small.
 
-## Workflow
+## Notebooks and scripts
 
-**1. Make the folds** from the training file (the test file is never used here):
+All in `notebooks/`, listed in the order of the [usage recipe](USAGE_RECIPE.md). CV = cross-validation; "test" = the final test set.
 
-| Notebook / script | What it does |
-|---|---|
-| `cluster_cv_folds.ipynb` | Cluster-held-out folds: positives clustered on ECFP4 Tanimoto distance, each fold tested on unseen clusters. Same method as `cv_method: 'cluster'` in `ml-pipeline-aircheck`. Writes the fold file (`train_cluster_cv_folds.npz`; the number of folds, up to 5, is decided by the clusters) and the matching CSV to `output/<DATASET>/cv_folds/`. |
-| `stratified_cv.py` | Stratified k-fold alternative: `python stratified_cv.py ../sample_data/train.parquet 5 --label-col LABEL`. Its indices refer to the parquet's rows, so use `DATA_PATH = Path("../sample_data/train.parquet")` with the `cv_5fold_indices.npz` it writes. |
+| Step | File | What it does |
+|---|---|---|
+| Folds | `cluster_cv_folds.ipynb` | Cluster-held-out CV folds from the train file (same method as `ml-pipeline-aircheck`) |
+| | `stratified_cv.py` | Alternative: stratified k-fold folds |
+| MMELON | `MMELON_finetuning_cv.ipynb` | CV fine-tuning of the multi-view model; picks the best epoch |
+| | `MMELON_inference_cv.ipynb` | Scores the test set with the fold models (ensemble) |
+| | `MMELON_finetuning.ipynb` | One model on a train file, best epoch picked on a second file |
+| | `MMELON_inference.ipynb` | Scores a file with that single model |
+| Single view | `MMELON_singleview_*.ipynb` (4) | The same four steps for one encoder: `VIEW = "text"`, `"image"` or `"graph"` |
+| LightGBM | `MMELON_embedding_extraction.ipynb` | Text, image, graph and fused embeddings (pretrained or fine-tuned model) |
+| | `MMELON_embedding_lgbm_cv.ipynb` | CV LightGBM on one embedding view |
+| | `MMELON_embedding_lgbm_inference.ipynb` | Scores test embeddings with the LightGBM fold models |
+| Report | `collect_results.ipynb` | Gathers every result for one `DATASET` into `report/report-<DATASET>.md` |
+| Tools | `run_recipe.py` | Runs the whole recipe in the background and writes the report |
+| | `run_notebook.sh` | Runs chosen notebooks in the background (survives a VS Code disconnect) |
+| | `download_from_gcs.py` | Copies data from a GCP bucket to `~/Datasets` |
 
-**2. Train and select a model** with cross-validation. The best epoch is chosen by the fold-averaged `SELECT_METRICS` (hit@200, then hit@100, hit@50 and AUROC to break ties):
-
-| Notebook | Model |
-|---|---|
-| `MMELON_finetuning_cv.ipynb` | MMELON (text + image + graph with attention fusion) |
-| `MMELON_singleview_finetuning_cv.ipynb` | One encoder on its own: `VIEW = "text"`, `"image"` or `"graph"` |
-| `MMELON_embedding_extraction.ipynb` → `MMELON_embedding_lgbm_cv.ipynb` | MMELON embeddings (text, image, graph or fused) + LightGBM |
-
-**3. Score the final test set** (`sample_data/test.parquet`) with the selected models:
-
-| Notebook | For models from |
-|---|---|
-| `MMELON_inference_cv.ipynb` | `MMELON_finetuning_cv.ipynb` (mean of the fold models) |
-| `MMELON_singleview_inference_cv.ipynb` | `MMELON_singleview_finetuning_cv.ipynb` |
-| `MMELON_embedding_lgbm_inference.ipynb` | `MMELON_embedding_lgbm_cv.ipynb`; first extract test embeddings with `MMELON_embedding_extraction.ipynb` (`DATA_PATH = Path("../sample_data/test.parquet")`, `EMBEDDING_NAME = "test-pretrained"`) |
-
-Each inference notebook writes `predictions.csv` (every molecule with its score and rank) and, when the file has labels, the metrics.
-
-**Single train/test split.** `MMELON_finetuning.ipynb` and `MMELON_singleview_finetuning.ipynb` (with `MMELON_inference.ipynb` and `MMELON_singleview_inference.ipynb`) train on one file and pick the best epoch on another. Because that second file is used for model selection, give them a validation file, not the final test set, when you want an unbiased final score.
-
-**4. Write the report.** `collect_results.ipynb` gathers every result for one `DATASET` into `report/report-<DATASET>.md`.
-
-**Other tools.** `run_notebook.sh` runs notebooks in the background so long runs survive a VS Code disconnect. `download_from_gcs.py` copies data from a GCP bucket to `~/Datasets`.
+The best epoch is chosen by `SELECT_METRICS` (hit@200, then hit@100, hit@50 and AUROC to break ties). Inference
+notebooks write `predictions.csv` (every molecule with its score and rank) and, with labels, the metrics.
+`MMELON_finetuning.ipynb` picks its epoch on its second file, so give it a validation file, not the final test set,
+for an unbiased test score.
 
 ## Class balancing
 
