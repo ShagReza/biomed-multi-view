@@ -80,8 +80,8 @@ For reference, a random ranking would place about K × (test active rate) active
 
 | Step | Run folder | Run time |
 |---|---|---|
-| Folds | `output/cv_folds/` | |
-| MMELON CV and test | `output/<RUN_NAME>/` | |
-| Single view CV and test | `output/<RUN_NAME>_<VIEW>/` | |
-| Embeddings | `output/embeddings/<EMBEDDING_NAME>/` | |
-| LightGBM CV and test | `output/lgbm/<RUN_NAME>/` | |
+| Folds | `output/<DATASET>/cv_folds/` | |
+| MMELON CV and test | `output/<DATASET>/<RUN_NAME>/` | |
+| Single view CV and test | `output/<DATASET>/<RUN_NAME>_<VIEW>/` | |
+| Embeddings | `output/<DATASET>/embeddings/<EMBEDDING_NAME>/` | |
+| LightGBM CV and test | `output/<DATASET>/lgbm/<RUN_NAME>/` | |

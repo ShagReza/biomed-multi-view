@@ -29,6 +29,7 @@ aircheck/
 
 1. Follow [INSTALL.md](INSTALL.md).
 2. Open the notebooks in `notebooks/` and run them from that folder. Every notebook's default paths point at `sample_data/` and `output/`, so the steps below run end to end on the sample data without edits.
+   Each notebook has a `DATASET` setting (default `"sample-data"`): all its outputs go under `output/<DATASET>/`, so runs on different datasets never mix.
 3. For your own data, change the paths and column names in each notebook's first cell. Input files can be `.csv` or `.parquet`, and only the needed columns are read.
 
 For a short step-by-step guide to which notebook to run when, see the [usage recipe](USAGE_RECIPE.md).
@@ -39,7 +40,7 @@ For a short step-by-step guide to which notebook to run when, see the [usage rec
 
 | Notebook / script | What it does |
 |---|---|
-| `cluster_cv_folds.ipynb` | Cluster-held-out folds: positives clustered on ECFP4 Tanimoto distance, each fold tested on unseen clusters. Same method as `cv_method: 'cluster'` in `ml-pipeline-aircheck`. Writes the fold `.npz` and the matching CSV to `output/cv_folds/`. |
+| `cluster_cv_folds.ipynb` | Cluster-held-out folds: positives clustered on ECFP4 Tanimoto distance, each fold tested on unseen clusters. Same method as `cv_method: 'cluster'` in `ml-pipeline-aircheck`. Writes the fold file (`train_cluster_cv_folds.npz`; the number of folds, up to 5, is decided by the clusters) and the matching CSV to `output/<DATASET>/cv_folds/`. |
 | `stratified_cv.py` | Stratified k-fold alternative: `python stratified_cv.py ../sample_data/train.parquet 5 --label-col LABEL`. Its indices refer to the parquet's rows, so use `DATA_PATH = Path("../sample_data/train.parquet")` with the `cv_5fold_indices.npz` it writes. |
 
 **2. Train and select a model** with cross-validation. The best epoch is chosen by the fold-averaged `SELECT_METRICS` (hit@200, then hit@100, hit@50 and AUROC to break ties):
@@ -56,7 +57,7 @@ For a short step-by-step guide to which notebook to run when, see the [usage rec
 |---|---|
 | `MMELON_inference_cv.ipynb` | `MMELON_finetuning_cv.ipynb` (mean of the fold models) |
 | `MMELON_singleview_inference_cv.ipynb` | `MMELON_singleview_finetuning_cv.ipynb` |
-| `MMELON_embedding_lgbm_inference.ipynb` | `MMELON_embedding_lgbm_cv.ipynb`; first extract test embeddings with `MMELON_embedding_extraction.ipynb` (`DATA_PATH = Path("../sample_data/test.parquet")`, `EMBEDDING_NAME = "sample-test-base"`) |
+| `MMELON_embedding_lgbm_inference.ipynb` | `MMELON_embedding_lgbm_cv.ipynb`; first extract test embeddings with `MMELON_embedding_extraction.ipynb` (`DATA_PATH = Path("../sample_data/test.parquet")`, `EMBEDDING_NAME = "test-pretrained"`) |
 
 Each inference notebook writes `predictions.csv` (every molecule with its score and rank) and, when the file has labels, the metrics.
 
@@ -82,4 +83,4 @@ With `BALANCE_CLASSES = True` (the default in the fine-tuning and LightGBM noteb
 
 `sample_data/` is a small random subset of an AIRCHECK **WDR91** ASMS screen: `LABEL` is 1 for a hit, `ID` is the row in the source file, and `ECFP4` is the 2048-bit ECFP4 fingerprint from the source (counts; the clustering uses them as bits). Both files come from the same screen and share no molecules. It is meant for checking that the notebooks run, not for benchmarking.
 
-The sample's training actives fall mostly in one chemical cluster, so `cluster_cv_folds.ipynb` builds a single fold from it with the default settings (the CV notebooks' defaults expect `train_cluster_cv_1fold_indices.npz`). With one fold, the CV result is that fold's score with no standard deviation, and the fold ensemble is a single model.
+The sample's training actives fall mostly in one chemical cluster, so `cluster_cv_folds.ipynb` builds a single fold from it with the default settings. With one fold, the CV result is that fold's score with no standard deviation, and the fold ensemble is a single model.

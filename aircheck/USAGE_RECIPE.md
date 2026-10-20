@@ -10,14 +10,17 @@ How to go from a train and a test file to evaluated models, and which notebook t
   - `test.parquet`: the **final test set**. Use it only in the inference steps, never to choose a model.
 - Both files need a SMILES column and a 0/1 label column; `train.parquet` also needs an `ECFP4` column for step 1. CSV works too.
 - Steps 2 to 5 are independent of each other: run the ones you need.
+- Set the same **`DATASET`** name (first setting in every notebook) for all steps on one dataset. Every output then goes to
+  `aircheck/output/<DATASET>/`, and the default paths between notebooks line up.
 
 ## 1. Make the folds
 
 **`cluster_cv_folds.ipynb`**: set `TRAIN_PATH` and the column names.
 
-It writes two files to `aircheck/output/cv_folds/`, and every k-fold notebook below needs both:
+It writes two files to `aircheck/output/<DATASET>/cv_folds/`, and every k-fold notebook below needs both:
 - `train_cluster_cv_data.csv`: the training molecules. Use it as `DATA_PATH`.
-- `train_cluster_cv_<k>fold_indices.npz`: the folds. Use it as `CV_INDICES_PATH`.
+- `train_cluster_cv_folds.npz`: the folds. Use it as `CV_INDICES_PATH`. The number of folds (up to 5) depends on the
+  clusters, and the CV notebooks read it from this file.
 
 ## 2. MMELON (multi-view)
 
@@ -51,8 +54,8 @@ Collect the results into the report (see [report/report-sampledata.md](report/re
 
 | What | File |
 |---|---|
-| CV result, MMELON or single view | `aircheck/output/<RUN_NAME>/cv_summary_per_epoch.csv` (the `best_epoch` row) and `selection.json` |
-| CV result, LightGBM | `aircheck/output/lgbm/<RUN_NAME>/cv_summary.csv` |
+| CV result, MMELON or single view | `aircheck/output/<DATASET>/<RUN_NAME>/cv_summary_per_epoch.csv` (the `best_epoch` row) and `selection.json` |
+| CV result, LightGBM | `aircheck/output/<DATASET>/lgbm/<RUN_NAME>/cv_summary.csv` |
 | Test result | `.../predictions/<PREDICTION_NAME>/metrics.csv` (or `metrics.json` for a single model) |
 | Scored test molecules | `.../predictions/<PREDICTION_NAME>/predictions.csv` |
 
