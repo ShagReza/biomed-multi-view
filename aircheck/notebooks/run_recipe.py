@@ -10,7 +10,7 @@ Usage, from any folder, with the notebooks' environment active:
         --train ~/Datasets/wdr91/train.parquet --test ~/Datasets/wdr91/test.parquet
     python aircheck/notebooks/run_recipe.py --dry-run                        # show the plan and check it, run nothing
 
-Options: --lgbm-params default|suggested, --smiles-col, --label-col, --resume <recipe_runs folder> (skip the steps
+Options: --lgbm-params suggested|default (default: suggested), --smiles-col, --label-col, --resume <recipe_runs folder> (skip the steps
 that finished; delete the folder of a step that stopped half-way first), --foreground (do not detach).
 
 It keeps running if VS Code disconnects, but not if the VM shuts down.
@@ -118,7 +118,7 @@ def main():
     p.add_argument("--test", default=str(NB_DIR.parent / "sample_data" / "test.parquet"))
     p.add_argument("--smiles-col", default="SMILES")
     p.add_argument("--label-col", default="LABEL")
-    p.add_argument("--lgbm-params", default="default", choices=["default", "suggested"])
+    p.add_argument("--lgbm-params", default="suggested", choices=["default", "suggested"])
     p.add_argument("--resume", default=None, help="a previous recipe_runs/<time> folder: skip its finished steps")
     p.add_argument("--dry-run", action="store_true", help="show the plan and check every setting exists")
     p.add_argument("--foreground", action="store_true", help="run in this terminal instead of the background")
