@@ -1,0 +1,13 @@
+# Used by "docker build -f aircheck/serving/Dockerfile ." (Docker reads <Dockerfile>.dockerignore).
+# Allowlist: skip everything, then add back only what the API needs. Models, data, notebooks, outputs,
+# .git, .env and models.json never enter the image.
+*
+!pyproject.toml
+!README.md
+!bmfm_sm
+!aircheck/serving/*.py
+!aircheck/serving/requirements-serving.txt
+
+**/__pycache__
+**/*.pyc
+bmfm_sm/**/tests
