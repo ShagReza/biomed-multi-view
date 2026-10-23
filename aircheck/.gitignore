@@ -8,3 +8,5 @@ sample_data/cv_*
 notebooks/.recipe_*
 # Logs in the committed example output (the root .gitignore ignores *.log)
 !sample_output/**/*.log
+# Local API settings (may hold real paths); serving/.env.example is the committed template
+serving/.env

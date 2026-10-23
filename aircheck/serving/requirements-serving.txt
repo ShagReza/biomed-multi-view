@@ -1,0 +1,4 @@
+# Packages for the prediction API only, on top of the repository's own requirements.
+# The notebooks do not need these. Install with:  pip install -r aircheck/serving/requirements-serving.txt
+fastapi==0.115.6   # defines the API endpoints and checks request/response formats
+uvicorn==0.32.1    # the web server that runs the API and waits for requests
