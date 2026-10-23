@@ -10,6 +10,7 @@ predictions. It reuses the inference logic of `../notebooks/MMELON_inference.ipy
 | `api.py` | The web API (FastAPI): endpoints, request and response formats, errors. |
 | `requirements-serving.txt` | Extra packages for the API only (FastAPI, Uvicorn); not needed for the notebooks. |
 | `.env.example` | The settings the API reads (names with placeholder values). Copy to `.env` for local use. |
+| `models.example.json` | Example `MODELS_CONFIG`: one entry per target, with its model type and path. |
 
 ## Inference files
 
@@ -39,4 +40,32 @@ predict(model, ["CCO", "c1ccccc1"])
 - Folds are more accurate but K times slower and use K times the memory; the API uses the final model.
 - LightGBM runs made before the final model was added have only fold models: use `models="folds"`.
 
-Status: API in progress.
+## API
+
+All models in `MODELS_CONFIG` are loaded once at startup.
+
+Run it locally:
+
+```bash
+cd aircheck/serving
+cp models.example.json models.json        # then edit the paths to your models
+MODELS_CONFIG=models.json ~/envs/biomed-multiview/bin/uvicorn api:app --port 8090
+```
+
+- Use the `biomed-multiview` env's `uvicorn` (or `micromamba activate ~/envs/biomed-multiview` first); another
+  Python fails with `No module named 'lightgbm'`.
+- Wait for `Application startup complete` (about 30-60 s), then open http://localhost:8090/docs to try the endpoints
+  (`/` itself shows "Not Found"; that is normal).
+- Port 8080 is used by Jupyter on the VM, so use another port such as 8090. Stop the server with Ctrl+C.
+- Optional settings: `MAX_SMILES` (default 50) and `DEVICE` (`cpu` or `cuda`), see `.env.example`.
+
+| Endpoint | Returns |
+|---|---|
+| `GET /health` | `{"status": "ok"}` |
+| `GET /targets` | each target with its model type, view and number of models |
+| `POST /predict` | body `{"target": "WDR91", "smiles": ["CCO", ...]}` (at most `MAX_SMILES`, default 50) → `{"target", "model", "results": [{"smiles", "score", "valid", "rank"}]}`, same order as sent; rank 1 = highest score |
+
+Errors: 404 for an unknown target, 422 for an empty or too long list. The website reads the user's file and sends
+the SMILES as a JSON list.
+
+Status: API done and tested locally; Docker image next.

@@ -1,0 +1,17 @@
+{
+  "WDR91": {
+    "type": "multiview_singleview",
+    "path": "/models/wdr91/mmelon-final",
+    "models": "full"
+  },
+  "WDR91-text": {
+    "type": "multiview_singleview",
+    "path": "/models/wdr91/singleview-final_text",
+    "view": "text"
+  },
+  "WDR91-lgbm": {
+    "type": "embedding_lgbm",
+    "path": "/models/wdr91/lgbm-text-finetuned",
+    "encoder_path": "/models/wdr91/mmelon-final"
+  }
+}

@@ -10,3 +10,4 @@ notebooks/.recipe_*
 !sample_output/**/*.log
 # Local API settings (may hold real paths); serving/.env.example is the committed template
 serving/.env
+serving/models.json
