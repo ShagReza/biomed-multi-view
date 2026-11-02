@@ -7,8 +7,8 @@ FROM python:3.11-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# g++ compiles pytorch-fast-transformers; libxrender1/libxext6 are needed by RDKit drawing (image view)
-RUN apt-get update && apt-get install -y --no-install-recommends g++ libxrender1 libxext6 \
+# g++ compiles pytorch-fast-transformers; libxrender1/libxext6/libexpat1 are needed by RDKit drawing (image view)
+RUN apt-get update && apt-get install -y --no-install-recommends g++ libxrender1 libxext6 libexpat1 \
     && rm -rf /var/lib/apt/lists/*
 
 # 1. CPU-only PyTorch (much smaller than the CUDA build)
@@ -25,15 +25,16 @@ RUN pip install --no-build-isolation setuptools==69.5.1 pytorch-fast-transformer
 WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY bmfm_sm ./bmfm_sm
-RUN SETUPTOOLS_SCM_PRETEND_VERSION=1.1 pip install -e .
+RUN pip install -e .
 
-# 5. API packages, LightGBM (same version as the training env), and the API code
+# 5. API packages, plus LightGBM and RDKit at the training env's versions (RDKit draws the image view's
+#    pictures, so another version changes multi-view and image scores), and the API code
 COPY aircheck/serving/requirements-serving.txt ./serving/
-RUN pip install -r serving/requirements-serving.txt lightgbm==4.7.0
+RUN pip install -r serving/requirements-serving.txt lightgbm==4.7.0 rdkit==2026.9.1
 COPY aircheck/serving/*.py ./serving/
 
 WORKDIR /app/serving
 ENV PORT=8080 MAX_SMILES=50 DEVICE=cpu
 EXPOSE 8080
 # Cloud Run sets PORT; MODELS_CONFIG must be given at run time
-CMD exec uvicorn api:app --host 0.0.0.0 --port ${PORT}
+CMD ["sh", "-c", "exec uvicorn api:app --host 0.0.0.0 --port ${PORT}"]
