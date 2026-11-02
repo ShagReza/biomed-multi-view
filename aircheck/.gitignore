@@ -11,3 +11,6 @@ notebooks/.recipe_*
 # Local API settings (may hold real paths); serving/.env.example is the committed template
 serving/.env
 serving/models.json
+# Executed notebook copies (their logs show the machine name) and the local GCS helper: kept local only
+sample_output/*/recipe_runs/
+tools/
