@@ -36,6 +36,22 @@ aircheck/
 
 For a short step-by-step guide to which notebook to run when, see the [usage recipe](USAGE_RECIPE.md).
 
+### Run the whole recipe
+
+An alternative to running the notebooks one by one, for when you want every condition (multi-view, each single view,
+and LightGBM on pretrained and fine-tuned embeddings). `run_recipe.py` runs every notebook of the recipe in order on
+your data (the saved notebooks are not changed), in the background, and writes the report at the end:
+
+```bash
+python aircheck/notebooks/run_recipe.py --dataset wdr91 --train <train file> --test <test file> --dry-run   # check first
+python aircheck/notebooks/run_recipe.py --dataset wdr91 --train <train file> --test <test file>
+```
+
+- Outputs go to `output/<DATASET>/`; progress is in `output/<DATASET>/recipe_runs/<time>/recipe.log`.
+- Columns default to `SMILES` and `LABEL`; change them with `--smiles-col` and `--label-col`.
+- If it stops (for example the VM shuts down), continue with `--resume output/<DATASET>/recipe_runs/<time>`.
+- With no options it runs on the sample data.
+
 To see what each step produces without running anything, look at `sample_output/sample-data/`: the outputs of the full recipe on the sample data and the resulting [report](report/report-sample-data.md). Model checkpoints, embedding files and the executed notebook copies (`recipe_runs/`) are left out to keep it small.
 
 ## Notebooks and scripts
