@@ -11,6 +11,8 @@ predictions. It reuses the inference logic of `../notebooks/MMELON_inference.ipy
 | `requirements-serving.txt` | Extra packages for the API only (FastAPI, Uvicorn); not needed for the notebooks. |
 | `.env.example` | The settings the API reads (names with placeholder values). Copy to `.env` for local use. |
 | `models.example.json` | Example `MODELS_CONFIG`: one entry per target, with its model type and path. |
+| `Dockerfile` | Builds the CPU image that runs the API. |
+| `Dockerfile.dockerignore` | What goes into the image: only the code, never models, data or settings. |
 
 ## Inference files
 
@@ -68,4 +70,49 @@ MODELS_CONFIG=models.json ~/envs/biomed-multiview/bin/uvicorn api:app --port 809
 Errors: 404 for an unknown target, 422 for an empty or too long list. The website reads the user's file and sends
 the SMILES as a JSON list.
 
-Status: API done and tested locally; Docker image next.
+## Docker
+
+The image holds the code and its packages (CPU-only PyTorch, about 3.5 GB). **Models are not in it**: they are
+mounted when the container runs, so a model can change without rebuilding.
+
+**Build**, from the repository root (the first build takes 10-20 minutes, mostly compiling
+`pytorch-fast-transformers`):
+
+```bash
+cd <repository root>
+docker build -f aircheck/serving/Dockerfile -t mmelon-api .
+```
+
+If docker says "permission denied", add yourself to the docker group once (`sudo usermod -aG docker $USER`), then
+run `newgrp docker` or open a new terminal.
+
+**Run**, giving it the models folder and the config:
+
+```bash
+docker run -p 8090:8080 \
+  -v /path/to/models:/models:ro \
+  -v /path/to/models-docker.json:/config/models.json:ro \
+  -e MODELS_CONFIG=/config/models.json \
+  mmelon-api
+# then open http://localhost:8090/docs
+```
+
+- The paths inside that `models.json` must be the paths **inside** the container (`/models/...`), not the host's,
+  so keep a separate copy from the one used without Docker.
+- The container serves port **8080** (what Cloud Run expects); `-p 8090:8080` maps it to 8090 on your machine.
+  It reads `PORT`, `MODELS_CONFIG`, `MAX_SMILES` and `DEVICE`.
+- `:ro` mounts the models read-only. Add `--network none` to check that it needs no internet.
+
+**Push to Artifact Registry** (fill in your own region, project and repository):
+
+```bash
+gcloud auth configure-docker <REGION>-docker.pkg.dev
+docker tag mmelon-api <REGION>-docker.pkg.dev/<PROJECT>/<REPOSITORY>/mmelon-api:v1
+docker push <REGION>-docker.pkg.dev/<PROJECT>/<REPOSITORY>/mmelon-api:v1
+```
+
+**To deploy it** (Cloud Run or any other host), three things are needed: the image above, a bucket holding the
+models and a `models.json` with `/models/...` paths, and the bucket mounted at `/models` with
+`MODELS_CONFIG=/models/models.json`. The website then calls `POST /predict`.
+
+Status: API and Docker image done and tested locally; the image is in Artifact Registry.
