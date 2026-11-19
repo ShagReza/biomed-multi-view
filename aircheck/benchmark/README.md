@@ -4,7 +4,9 @@
 standard format of [aircheck-benchmark-core](https://github.com/ShagReza/aircheck-benchmark-core). Core then
 computes the metrics and the report, the same way for every model in the benchmark.
 
-This folder is plain Python. The notebooks in [../notebooks/](../notebooks/) are unchanged and still work on their own.
+This folder is plain Python: `run_all.sh` → `run.py` → `methods/`. The notebooks in [notebooks/](notebooks/)
+do the same steps one at a time for exploring, and define no code of their own. The old notebooks in
+[../notebooks/](../notebooks/) are untouched and still work on their own.
 
 ## Setup
 
@@ -17,25 +19,61 @@ This folder is plain Python. The notebooks in [../notebooks/](../notebooks/) are
    aircheck-bench --version   # check
    ```
 
-## Run
+## An experiment
+
+An **experiment** is one dataset with one set of conditions, and everything it produces stays in its own
+folder under `aircheck/output/`, so this repo is self-contained: whoever is interested in MMELON finds the
+folds, the models, the predictions and the report in one place.
+
+```
+aircheck/output/<experiment>/
+├── experiment.json      the train/test files and fold settings this experiment was made with
+├── folds/               the fold files (made here the first time, then reused)
+├── <run name>/          predictions.csv, run.json, progress.log, models/
+├── embeddings/          shared by the LightGBM runs of the same encoder
+├── report.md            every run in this experiment, with report_summary.csv next to it
+└── run_all.log
+```
+Use a new name for other conditions, for example `wdr91-cluster` and `wdr91-stratified`. `experiment.json` is
+checked on every run, so one name cannot end up holding results from two different datasets.
+
+## Run everything (the recipe)
 
 ```bash
-# 1. Folds, made once per dataset (by core; the same files for every model)
-aircheck-bench make-folds --train ~/Datasets/wdr91/train.parquet --out ~/Datasets/wdr91/folds --method cluster
+aircheck/benchmark/run_all.sh --experiment wdr91-cluster \
+    --train ~/Datasets/wdr91/train.parquet --test ~/Datasets/wdr91/test.parquet
+```
+That one command makes the folds (if they are not there yet), does the 12 runs below one after another, and
+ends with `aircheck-bench report`, which writes **`aircheck/output/wdr91-cluster/report.md`** and
+`report_summary.csv` next to it. `aircheck/benchmark/run_all.sh --help` lists every option.
 
-# 2. One command per method, from the repo root
+| Run | Method |
+|---|---|
+| `finetune_multiview`, `finetune_text`, `finetune_image`, `finetune_graph` | fine-tuning, one per view |
+| `lgbm_pretrained_fused`, `..._text`, `..._image`, `..._graph` | LightGBM on pretrained embeddings |
+| `lgbm_finetuned_fused`, `..._text`, `..._image`, `..._graph` | LightGBM on embeddings from the `finetune_multiview` final model |
+
+- **Resumable:** a run that already has `run.json` is skipped, so starting the script again after an
+  interruption (or after the VM shut down) continues where it stopped. Delete a run's folder to redo it.
+- **`--only a,b` / `--skip a,b`** pick runs (`--list` prints the names), and any further options go to every
+  `run.py` call, e.g. `--num-workers 2` or `--epochs 3` for a quick try. `--only none` just rewrites the report.
+- **Fold method:** `--cv-method cluster` (default), `stratified` or `random`, with `--n-folds`; or `--folds
+  <npz>` to use fold files from somewhere else. The folds are made once and then reused by every run.
+- **Disk:** `aircheck/output/` is gitignored, and a full experiment is tens of GB (one fine-tuned model per
+  fold, per view). Put it on a bigger disk with `--root /home/jupyter/benchmark` if the boot disk is tight.
+- **Long runs:** `nohup aircheck/benchmark/run_all.sh --experiment wdr91-cluster ... > /dev/null 2>&1 &`,
+  then follow `aircheck/output/wdr91-cluster/run_all.log`.
+
+## Run one method
+
+```bash
 python aircheck/benchmark/run.py --method finetune --view multiview \
-    --folds ~/Datasets/wdr91/folds/train_cluster_cv_folds.npz --test ~/Datasets/wdr91/test.parquet \
-    --out results/wdr91/mmelon/finetune_multiview
-python aircheck/benchmark/run.py --method embed_lgbm --view fused \
-    --folds ~/Datasets/wdr91/folds/train_cluster_cv_folds.npz --test ~/Datasets/wdr91/test.parquet \
-    --out results/wdr91/mmelon/embed_lgbm_fused
-
-# 3. Report on every run in the folder (by core)
-aircheck-bench report --results results/wdr91/ --folds ~/Datasets/wdr91/folds/train_cluster_cv_folds.npz
+    --folds aircheck/output/wdr91-cluster/folds/train_cluster_cv_folds.npz \
+    --test ~/Datasets/wdr91/test.parquet --out aircheck/output/wdr91-cluster/finetune_multiview
 ```
 The training molecules are the folds CSV next to `--folds` (`<name>_cv_data.csv`), so the folds and the rows they
-refer to always match. Long runs: start them with `nohup ... &` or in `tmux`, and follow `<out>/progress.log`.
+refer to always match. Follow a run in `<out>/progress.log`. The notebooks in [notebooks/](notebooks/) do the
+same through `run_one` in `run.py`, one step at a time.
 
 ## Methods
 
@@ -55,6 +93,7 @@ Settings (left out = the default in `methods/<method>.py`, the same as the noteb
 | `--no-final` | finetune | final model on (skip it to save time; then only `test_ensemble`) |
 | `--encoder` | embed_lgbm | pretrained base model |
 | `--lgbm-params` | embed_lgbm | `suggested` (or `default`) |
+| `--embeddings-dir` | embed_lgbm | `<out>/../embeddings/<encoder>/` |
 | `--no-balance` | both | classes balanced |
 | `--seed` | both | 42 |
 | `--num-workers` | finetune | all CPUs, up to 24. Each worker holds its own data, so on a small VM use 0–2 (multi-view with 8 workers ran out of memory on 8 GB) |
@@ -70,8 +109,17 @@ predictions.csv   split, row, SMILES, LABEL, score: one row per scored molecule
 run.json          model, method, display name, settings, selected epoch, hardware, this repo's commit, core version
 progress.log      what happened, with times
 models/           the trained models (fold_<i>/, final/ for finetune; fold_<i>.txt, full.txt for embed_lgbm)
-embeddings/       embed_lgbm only: cached embeddings, reused when the same run is repeated
+config.json       embed_lgbm only: what ../serving/ needs to score new molecules with this run's models
 ```
+`embed_lgbm` writes the embeddings one folder up, so every view and every rerun of the same encoder shares them:
+```
+<out>/../embeddings/<pretrained | finetuned-<run name>>/<train | test>/
+├── config.json                    encoder, number of molecules, views
+├── <view>/part-00000.parquet      row_index, smiles, embedding — the same layout as the extraction notebook
+└── invalid_smiles.csv             rows RDKit cannot read (no embedding, empty score)
+```
+All four views come from one pass of the encoder, so the first LightGBM run of an encoder pays for the
+embeddings and the next three are nearly free.
 `run.py` prints the scores at the end (computed by core, which also checks that every fold's predictions are
 exactly that fold's test rows). Molecules with a SMILES that RDKit cannot read get an empty score; core ranks
 them last.
@@ -87,3 +135,16 @@ them last.
   logged during training, as in the notebooks.
 - **Folds and metrics** come from aircheck-benchmark-core instead of `cluster_cv_folds.ipynb` and the
   notebooks' `compute_metrics`; both give the same results.
+- **One folder per experiment** instead of `output/<dataset>/<run name>/` plus `report/report-<dataset>.md`.
+- **Embeddings:** the same parquet files, but all four views come from one pass and are shared by the runs of
+  an encoder, where the extraction notebook was run once per model and dataset.
+
+## A note on reproducing numbers
+
+Embeddings computed on a GPU and on a CPU differ by about 1e-6 per value. That is enough to move LightGBM's
+splits and change hit@50 by a molecule or two, so the metrics are **not** identical across machines. With the
+same embedding files the numbers match the old notebooks exactly (checked on the sample data). So:
+
+- Keep the embeddings an experiment produced; do not delete them and recompute on other hardware mid-way.
+- Compare models within one experiment, which is what the report does.
+- `run.json` records the hardware, the fork commit and the core version of every run.

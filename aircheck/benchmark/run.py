@@ -1,19 +1,22 @@
 """Run one MMELON benchmark method on one dataset and write its predictions for aircheck-benchmark-core.
 
     python aircheck/benchmark/run.py --method finetune --view multiview \\
-        --folds folds/train_cluster_cv_folds.npz --test test.parquet --out results/wdr91/mmelon/finetune_multiview
-    python aircheck/benchmark/run.py --method embed_lgbm --view fused --folds ... --test ... --out ...
+        --folds aircheck/output/<experiment>/folds/train_cluster_cv_folds.npz \\
+        --test ~/Datasets/wdr91/test.parquet --out aircheck/output/<experiment>/finetune_multiview
 
 Methods (see methods/*.py):
   finetune     fine-tune MMELON: --view multiview (default), text, image or graph
   embed_lgbm   LightGBM on MMELON embeddings: --view fused (default), text, image or graph
 
-The training molecules are the folds CSV next to --folds (<name>_cv_data.csv, from `aircheck-bench make-folds`).
+Use run_all.sh to do every method of one experiment in one command. The training molecules are the folds CSV
+next to --folds (<name>_cv_data.csv, from `aircheck-bench make-folds`).
+
 Output in --out: predictions.csv and run.json (read by `aircheck-bench score` and `aircheck-bench report`),
-progress.log, and models/ (the trained models).
+progress.log, and models/ (the trained models). The notebooks in notebooks/ call `run_one` below.
 """
 
 import argparse
+import importlib
 import json
 import sys
 from datetime import datetime
@@ -30,6 +33,72 @@ from methods import common  # noqa: E402
 
 METHODS = ("finetune", "embed_lgbm")
 NAMES = {"finetune": "MMELON fine-tuned ({view})", "embed_lgbm": "LightGBM on MMELON {view} embeddings ({encoder})"}
+SCORE_COLUMNS = ["split", "n", "n_pos", "hit@200", "hit@100", "hit@50", "rocauc", "pr_auc"]
+
+
+def load_data(folds_npz, test, smiles_col="SMILES", label_col="LABEL") -> tuple:
+    """(training molecules, folds, test molecules): the folds CSV next to `folds_npz`, and the test file."""
+    folds_npz = Path(folds_npz).expanduser()
+    data_csv = Path(str(folds_npz).replace("_folds.npz", "_data.csv"))
+    assert data_csv.exists(), f"No folds CSV next to {folds_npz.name}: expected {data_csv}"
+    data = pd.read_csv(data_csv, usecols=[smiles_col, label_col])
+    data = data.rename(columns={smiles_col: "smiles", label_col: "label"})[["smiles", "label"]]
+    data["label"] = data["label"].astype(int)
+    folds = load_folds(folds_npz)
+    assert max(int(i.max()) for f in folds for i in f) < len(data), f"Fold indices do not fit {data_csv.name}"
+
+    frame = read_columns(Path(test).expanduser(), [smiles_col, label_col])
+    frame = frame.rename(columns={smiles_col: "smiles", label_col: "label"})[["smiles", "label"]]
+    assert frame["label"].notna().all(), "The test file needs a label for every row"
+    frame["label"] = frame["label"].astype(int)
+    return data, folds, frame
+
+
+def run_one(method: str, folds, test, out, settings=None, name=None, smiles_col="SMILES", label_col="LABEL",
+            num_workers=None) -> pd.DataFrame:
+    """Run one method and write predictions.csv and run.json to `out`. Returns the scores per split.
+
+    `settings` are the method's own settings (see DEFAULTS in methods/<method>.py); what is left out keeps its
+    default. This is what run.py does on the command line, and what the notebooks call.
+    """
+    assert method in METHODS, f"method must be one of {METHODS}"
+    out, folds_npz = Path(out).expanduser().resolve(), Path(folds).expanduser()
+    assert not (out / "predictions.csv").exists(), f"{out} already holds a run; choose another out or delete it"
+    out.mkdir(parents=True, exist_ok=True)
+    log = common.Log(out / "progress.log")
+    if num_workers is not None:
+        common.NUM_WORKERS = num_workers
+
+    data, fold_list, test_frame = load_data(folds_npz, test, smiles_col, label_col)
+    log(f"{method}: {len(data):,} training rows ({int(data['label'].sum()):,} actives), {len(fold_list)} folds; "
+        f"{len(test_frame):,} test rows; device {common.DEVICE}")
+
+    module = importlib.import_module(f"methods.{method}")
+    settings = {k: v for k, v in (settings or {}).items() if k in module.DEFAULTS and v is not None}
+    predictions, extras, used = module.run(data, fold_list, test_frame, settings, out, log)
+    paths = used.pop("paths", {})  # folders the method used (not settings: long paths widen the report's table)
+
+    predictions.to_csv(out / "predictions.csv", index=False)
+    encoder = "fine-tuned" if used.get("encoder") else "pretrained"
+    (out / "run.json").write_text(json.dumps({
+        "model": "mmelon",
+        "method": method,
+        "name": name or NAMES[method].format(view=used["view"], encoder=encoder),
+        "settings": used,
+        "report_extras": extras,
+        "hardware": common.hardware(),
+        "fork_commit": common.fork_commit(),
+        "core_version": core_version,
+        "folds": str(folds_npz.resolve()),
+        "test": str(Path(test).expanduser().resolve()),
+        **({"paths": paths} if paths else {}),
+        "created": datetime.now().isoformat(timespec="seconds"),
+    }, indent=2) + "\n")
+
+    table = score_predictions(predictions, folds_npz=folds_npz)  # also checks the fold rows
+    log("Done. Scores (computed by aircheck-benchmark-core):\n" + table[SCORE_COLUMNS].round(4).to_string(index=False))
+    log(f"Saved {out / 'predictions.csv'} and {out / 'run.json'}")
+    return table
 
 
 def parse_args(argv=None):
@@ -61,70 +130,17 @@ def parse_args(argv=None):
     g = p.add_argument_group("embed_lgbm")
     g.add_argument("--encoder", help="fine-tuned best_model.ckpt to embed with (default: pretrained base model)")
     g.add_argument("--lgbm-params", choices=("suggested", "default"))
+    g.add_argument("--embeddings-dir", help="where the embeddings are cached (default: <out>/../embeddings/<encoder>)")
     return p.parse_args(argv)
-
-
-def load_data(args) -> tuple:
-    folds_npz = Path(args.folds).expanduser()
-    data_csv = Path(str(folds_npz).replace("_folds.npz", "_data.csv"))
-    assert data_csv.exists(), f"No folds CSV next to {folds_npz.name}: expected {data_csv}"
-    data = pd.read_csv(data_csv, usecols=[args.smiles_col, args.label_col])
-    data = data.rename(columns={args.smiles_col: "smiles", args.label_col: "label"})[["smiles", "label"]]
-    data["label"] = data["label"].astype(int)
-    folds = load_folds(folds_npz)
-    assert max(int(i.max()) for f in folds for i in f) < len(data), f"Fold indices do not fit {data_csv.name}"
-
-    test = read_columns(Path(args.test).expanduser(), [args.smiles_col, args.label_col])
-    test = test.rename(columns={args.smiles_col: "smiles", args.label_col: "label"})[["smiles", "label"]]
-    assert test["label"].notna().all(), "The test file needs a label for every row"
-    test["label"] = test["label"].astype(int)
-    return data, folds, test, folds_npz
 
 
 def main(argv=None):
     args = parse_args(argv)
-    out = Path(args.out).expanduser().resolve()
-    assert not (out / "predictions.csv").exists(), f"{out} already holds a run; choose another --out or delete it"
-    out.mkdir(parents=True, exist_ok=True)
-    log = common.Log(out / "progress.log")
-    if args.num_workers is not None:
-        common.NUM_WORKERS = args.num_workers
-
-    data, folds, test, folds_npz = load_data(args)
-    log(f"{args.method}: {len(data):,} training rows ({int(data['label'].sum()):,} actives), {len(folds)} folds; "
-        f"{len(test):,} test rows; device {common.DEVICE}")
-
-    if args.method == "finetune":
-        from methods import finetune as method
-    else:
-        from methods import embed_lgbm as method
     settings = {k: getattr(args, k) for k in ("view", "seed", "batch_size", "balance_classes", "epochs", "patience",
                                               "learning_rate", "weight_decay", "select_metrics", "final",
-                                              "encoder", "lgbm_params")}
-    settings = {k: v for k, v in settings.items() if k in method.DEFAULTS}
-    predictions, extras, used = method.run(data, folds, test, settings, out, log)
-
-    predictions.to_csv(out / "predictions.csv", index=False)
-    encoder = "fine-tuned" if used.get("encoder") else "pretrained"
-    run_info = {
-        "model": "mmelon",
-        "method": args.method,
-        "name": args.name or NAMES[args.method].format(view=used["view"], encoder=encoder),
-        "settings": used,
-        "report_extras": extras,
-        "hardware": common.hardware(),
-        "fork_commit": common.fork_commit(),
-        "core_version": core_version,
-        "folds": str(folds_npz.resolve()),
-        "test": str(Path(args.test).expanduser().resolve()),
-        "created": datetime.now().isoformat(timespec="seconds"),
-    }
-    (out / "run.json").write_text(json.dumps(run_info, indent=2) + "\n")
-
-    table = score_predictions(predictions, folds_npz=folds_npz)  # also checks the fold rows
-    cols = ["split", "n", "n_pos", "hit@200", "hit@100", "hit@50", "rocauc", "pr_auc"]
-    log("Done. Scores (computed by aircheck-benchmark-core):\n" + table[cols].round(4).to_string(index=False))
-    log(f"Saved {out / 'predictions.csv'} and {out / 'run.json'}")
+                                              "encoder", "lgbm_params", "embeddings_dir")}
+    run_one(args.method, args.folds, args.test, args.out, settings=settings, name=args.name,
+            smiles_col=args.smiles_col, label_col=args.label_col, num_workers=args.num_workers)
 
 
 if __name__ == "__main__":
