@@ -61,6 +61,9 @@ ends with `aircheck-bench report`, which writes **`aircheck/output/wdr91-cluster
   <npz>` to use fold files from somewhere else. The folds are made once and then reused by every run.
 - **Disk:** `aircheck/output/` is gitignored, and a full experiment is tens of GB (one fine-tuned model per
   fold, per view). Put it on a bigger disk with `--root /home/jupyter/benchmark` if the boot disk is tight.
+- **Several models at once:** `--no-report` leaves the report to the caller; that is what
+  [aircheck-benchmark-pipeline](https://github.com/ShagReza/aircheck-benchmark-pipeline) uses when it runs
+  every model of the benchmark into one experiment folder.
 - **Long runs:** `nohup aircheck/benchmark/run_all.sh --experiment wdr91-cluster ... > /dev/null 2>&1 &`,
   then follow `aircheck/output/wdr91-cluster/run_all.log`.
 

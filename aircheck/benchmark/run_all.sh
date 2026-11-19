@@ -27,6 +27,7 @@
 #   --folds <npz>         use these fold files instead of making them in the experiment
 #   --root <dir>          where experiments live (default: aircheck/output)
 #   --report <path>       report file (default: <experiment>/report.md)
+#   --no-report           do not write a report (for a caller that reports over several models)
 #   --smiles-col, --label-col   column names (default SMILES, LABEL)
 #   --only a,b / --skip a,b / --list    pick runs; --only none just rewrites the report
 #   anything else         goes to every run.py call, e.g. --num-workers 2 or --epochs 3
@@ -50,6 +51,7 @@ while [[ $# -gt 0 ]]; do
         --cv-method)  CV_METHOD="$2";  shift 2 ;;
         --n-folds)    N_FOLDS="$2";    shift 2 ;;
         --report)     REPORT="$2";     shift 2 ;;
+        --no-report)  REPORT="none";   shift ;;    # the caller writes the report (e.g. aircheck-benchmark-pipeline)
         --smiles-col) SMILES_COL="$2"; shift 2 ;;
         --label-col)  LABEL_COL="$2";  shift 2 ;;
         --only)       ONLY=",$2,";     shift 2 ;;
@@ -171,6 +173,10 @@ for entry in "${RUNS[@]}"; do
     say "$name done"
 done
 
+if [[ "$REPORT" == "none" ]]; then
+    say "All done in $((($(date +%s) - started) / 60)) min. No report asked for (--no-report)."
+    exit 0
+fi
 if ! compgen -G "$EXP_DIR/*/run.json" > /dev/null; then
     say "No finished run in $EXP_DIR yet, so there is nothing to report."
     exit 0
