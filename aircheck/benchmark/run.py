@@ -63,7 +63,9 @@ def run_one(method: str, folds, test, out, settings=None, name=None, smiles_col=
     """
     assert method in METHODS, f"method must be one of {METHODS}"
     out, folds_npz = Path(out).expanduser().resolve(), Path(folds).expanduser()
-    assert not (out / "predictions.csv").exists(), f"{out} already holds a run; choose another out or delete it"
+    # run.json is written last, so it marks a finished run; a predictions.csv without it is the
+    # leftover of an interrupted run and is overwritten
+    assert not (out / "run.json").exists(), f"{out} already holds a finished run; choose another out or delete it"
     out.mkdir(parents=True, exist_ok=True)
     log = common.Log(out / "progress.log")
     if num_workers is not None:
@@ -81,7 +83,7 @@ def run_one(method: str, folds, test, out, settings=None, name=None, smiles_col=
     predictions.to_csv(out / "predictions.csv", index=False)
     encoder = "fine-tuned" if used.get("encoder") else "pretrained"
     (out / "run.json").write_text(json.dumps({
-        "model": "mmelon",
+        "model": common.MODEL,
         "method": method,
         "name": name or NAMES[method].format(view=used["view"], encoder=encoder),
         "settings": used,

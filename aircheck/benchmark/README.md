@@ -28,11 +28,12 @@ folds, the models, the predictions and the report in one place.
 ```
 aircheck/output/<experiment>/
 ├── experiment.json      the train/test files and fold settings this experiment was made with
-├── folds/               the fold files (made here the first time, then reused)
-├── <run name>/          predictions.csv, run.json, progress.log, models/
-├── embeddings/          shared by the LightGBM runs of the same encoder
-├── report.md            every run in this experiment, with report_summary.csv next to it
-└── run_all.log
+├── folds/               the fold files (made here the first time, then reused), shared by every model
+├── mmelon/        this model's own folder, so several models can share one experiment
+│   ├── <run name>/      predictions.csv, run.json, progress.log, models/
+│   ├── embeddings/      shared by this model's LightGBM runs of the same encoder
+│   └── run_all.log
+└── report.md            every run in this experiment, with report_summary.csv next to it
 ```
 Use a new name for other conditions, for example `wdr91-cluster` and `wdr91-stratified`. `experiment.json` is
 checked on every run, so one name cannot end up holding results from two different datasets.
@@ -44,7 +45,7 @@ aircheck/benchmark/run_all.sh --experiment wdr91-cluster \
     --train ~/Datasets/wdr91/train.parquet --test ~/Datasets/wdr91/test.parquet
 ```
 That one command makes the folds (if they are not there yet), does the 12 runs below one after another, and
-ends with `aircheck-bench report`, which writes **`aircheck/output/wdr91-cluster/report.md`** and
+ends with `aircheck-bench report`, which writes **`aircheck/output/wdr91-cluster/mmelon/report.md`** and
 `report_summary.csv` next to it. `aircheck/benchmark/run_all.sh --help` lists every option.
 
 | Run | Method |
@@ -65,14 +66,14 @@ ends with `aircheck-bench report`, which writes **`aircheck/output/wdr91-cluster
   [aircheck-benchmark-pipeline](https://github.com/ShagReza/aircheck-benchmark-pipeline) uses when it runs
   every model of the benchmark into one experiment folder.
 - **Long runs:** `nohup aircheck/benchmark/run_all.sh --experiment wdr91-cluster ... > /dev/null 2>&1 &`,
-  then follow `aircheck/output/wdr91-cluster/run_all.log`.
+  then follow `aircheck/output/wdr91-cluster/mmelon/run_all.log`.
 
 ## Run one method
 
 ```bash
 python aircheck/benchmark/run.py --method finetune --view multiview \
     --folds aircheck/output/wdr91-cluster/folds/train_cluster_cv_folds.npz \
-    --test ~/Datasets/wdr91/test.parquet --out aircheck/output/wdr91-cluster/finetune_multiview
+    --test ~/Datasets/wdr91/test.parquet --out aircheck/output/wdr91-cluster/mmelon/finetune_multiview
 ```
 The training molecules are the folds CSV next to `--folds` (`<name>_cv_data.csv`), so the folds and the rows they
 refer to always match. Follow a run in `<out>/progress.log`. The notebooks in [notebooks/](notebooks/) do the
@@ -114,7 +115,8 @@ progress.log      what happened, with times
 models/           the trained models (fold_<i>/, final/ for finetune; fold_<i>.txt, full.txt for embed_lgbm)
 config.json       embed_lgbm only: what ../serving/ needs to score new molecules with this run's models
 ```
-`embed_lgbm` writes the embeddings one folder up, so every view and every rerun of the same encoder shares them:
+`embed_lgbm` writes the embeddings one folder up, under this model's name, so every view and every
+rerun of the same encoder shares them (and two models in one experiment folder never mix):
 ```
 <out>/../embeddings/<pretrained | finetuned-<run name>>/<train | test>/
 ├── config.json                    encoder, number of molecules, views

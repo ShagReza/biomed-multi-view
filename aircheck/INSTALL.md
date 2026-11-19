@@ -7,7 +7,20 @@ To run the AIRCHECK notebooks:
    ```bash
    pip install -r aircheck/requirements-aircheck.txt
    ```
-3. Open a notebook in `aircheck/archive-to-be-deleted/notebooks/` with that environment as the kernel, and run it from that folder (the default paths, like `../sample_data/train.parquet`, are relative to it).
+3. Install [aircheck-benchmark-core](https://github.com/ShagReza/aircheck-benchmark-core), which the benchmark
+   code imports for the folds, the metrics and the report:
+   ```bash
+   git clone git@github.com:ShagReza/aircheck-benchmark-core.git ~/repos/aircheck-benchmark-core
+   pip install -e ~/repos/aircheck-benchmark-core
+   aircheck-bench --version    # check
+   ```
+4. Check the environment:
+   ```bash
+   python -c "import bmfm_sm, aircheck_benchmark_core; print('ok')"
+   ```
+
+Then run the benchmark with [benchmark/README.md](benchmark/README.md), or open a notebook in
+`aircheck/benchmark/notebooks/` with this environment as the kernel and run it from that folder.
 
 ## Troubleshooting: `pytorch-fast-transformers`
 

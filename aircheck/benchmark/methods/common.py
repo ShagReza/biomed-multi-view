@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import torch
 
+MODEL = "mmelon"  # this fork's name in run.json and in the shared results folder
 AIRCHECK_DIR = Path(__file__).resolve().parents[2]
 REPO_ROOT = AIRCHECK_DIR.parent
 sys.path.insert(0, str(AIRCHECK_DIR / "serving"))  # the serving modules import each other by plain name

@@ -9,13 +9,14 @@ A real experiment lives in `aircheck/output/<experiment>/`, which is not tracked
 ```
 sample_output/wdr91-cluster/
 ├── experiment.json          the train/test files and fold settings of this experiment
-├── folds/                   the fold files, made once and shared by every run and every model
-├── finetune_multiview/      one run: predictions.csv, run.json, progress.log, models/
-├── lgbm_pretrained_fused/   another run, plus config.json for scoring new molecules
-├── embeddings/              shared by the LightGBM runs of one encoder
-├── report.md                every run in the experiment, scored by aircheck-benchmark-core
-├── report_summary.csv       the same numbers as a table, one row per run and split
-└── run_all.log              what the recipe did, with times
+├── folds/                   the fold files, made once and shared by every model
+├── mmelon/                  one folder per model, so several models share one experiment
+│   ├── finetune_multiview/  one run: predictions.csv, run.json, progress.log, models/
+│   ├── lgbm_pretrained_fused/another run, plus config.json for scoring new molecules
+│   ├── embeddings/          shared by this model's LightGBM runs of one encoder
+│   └── run_all.log          what the recipe did, with times
+├── report.md                every model's runs, scored by aircheck-benchmark-core
+└── report_summary.csv       the same numbers as a table, one row per run and split
 ```
 
 Only two runs are shown; the other three views (`finetune_text`, `finetune_image`, `finetune_graph`,

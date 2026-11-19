@@ -48,8 +48,10 @@ DEFAULTS = dict(view="multiview", epochs=50, patience=5, batch_size=16, learning
 VIEW_SPECS = {
     "multiview": dict(
         model_class="bmfm_sm.predictive.modules.smmv_model.SmallMoleculeMultiView",
-        model_params={"agg_arch": FUSION_STRATEGY.value[0], "agg_gate_input": FUSION_STRATEGY.value[1],
-                      "agg_weight_freeze": FUSION_STRATEGY.value[2], "inference_mode": False},
+        # by name, as bmfm_sm.api.smmv_api does: value[0] is the short name, not agg_arch
+        model_params={"agg_arch": FUSION_STRATEGY.agg_arch,
+                      "agg_gate_input": FUSION_STRATEGY.projection_type,
+                      "agg_weight_freeze": None, "inference_mode": False},
         pipeline=MultiModalFinetuneDataPipeline, modalities=["TEXT_MODEL", "IMAGE_MODEL", "GRAPH_2D_MODEL"],
         weight_prefix=None,
     ),
@@ -138,6 +140,7 @@ def round_key(means, select_metrics) -> tuple:
 def train_cv(data: pd.DataFrame, folds: list, s: dict, models_dir: Path, log) -> tuple:
     """Train the folds side by side; returns (selected epoch, epochs trained, per fold-epoch metrics)."""
     view = s["view"]
+    assert s["epochs"] >= 1, "epochs must be at least 1"
     allowed = [f"hit@{k}" for k in HIT_KS] + ["rocauc", "pr_auc", "precision", "recall", "specificity", "loss"]
     assert set(s["select_metrics"]) <= set(allowed), f"select_metrics must come from {allowed}"
 

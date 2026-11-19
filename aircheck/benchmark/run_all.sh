@@ -5,11 +5,12 @@
 #
 #   aircheck/output/<experiment>/
 #   ├── experiment.json      the train/test files and fold settings this experiment was made with
-#   ├── folds/               the fold files (made here if they are not there yet)
-#   ├── <run name>/          predictions.csv, run.json, progress.log, models/
-#   ├── embeddings/          shared by the LightGBM runs of the same encoder
-#   ├── report.md            every run in this experiment, with report_summary.csv next to it
-#   └── run_all.log
+#   ├── folds/               the fold files (made here if they are not there yet), shared by every model
+#   ├── mmelon/          this model's own folder, so several models can share one experiment
+#   │   ├── <run name>/      predictions.csv, run.json, progress.log, models/
+#   │   ├── embeddings/      shared by this model's LightGBM runs of the same encoder
+#   │   └── run_all.log
+#   └── report.md            every run in this experiment, with report_summary.csv next to it
 #
 # Usage, from the repo root, with the MMELON environment active:
 #   aircheck/benchmark/run_all.sh --experiment <name> --train <train file> --test <test file> [options]
@@ -29,6 +30,7 @@
 #   --report <path>       report file (default: <experiment>/report.md)
 #   --no-report           do not write a report (for a caller that reports over several models)
 #   --smiles-col, --label-col   column names (default SMILES, LABEL)
+#   --fingerprint-col <name>    the fingerprint cluster folds use (default ECFP4)
 #   --only a,b / --skip a,b / --list    pick runs; --only none just rewrites the report
 #   anything else         goes to every run.py call, e.g. --num-workers 2 or --epochs 3
 #
@@ -40,7 +42,7 @@
 set -uo pipefail
 
 EXPERIMENT="" ROOT="" TRAIN="" TEST="" FOLDS="" CV_METHOD="cluster" N_FOLDS="" REPORT=""
-SMILES_COL="SMILES" LABEL_COL="LABEL" ONLY="" SKIP="" LIST=0 EXTRA=()
+SMILES_COL="SMILES" LABEL_COL="LABEL" FINGERPRINT_COL="ECFP4" ONLY="" SKIP="" LIST=0 EXTRA=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --experiment) EXPERIMENT="$2"; shift 2 ;;
@@ -53,6 +55,7 @@ while [[ $# -gt 0 ]]; do
         --report)     REPORT="$2";     shift 2 ;;
         --no-report)  REPORT="none";   shift ;;    # the caller writes the report (e.g. aircheck-benchmark-pipeline)
         --smiles-col) SMILES_COL="$2"; shift 2 ;;
+        --fingerprint-col) FINGERPRINT_COL="$2"; shift 2 ;;   # cluster folds only
         --label-col)  LABEL_COL="$2";  shift 2 ;;
         --only)       ONLY=",$2,";     shift 2 ;;
         --skip)       SKIP=",$2,";     shift 2 ;;
@@ -92,17 +95,20 @@ if [[ -z "$EXPERIMENT" || -z "$TEST" ]]; then
     exit 2
 fi
 EXP_DIR="${ROOT:-$AIRCHECK/output}/$EXPERIMENT"
+MODEL="mmelon"
+MODEL_DIR="$EXP_DIR/$MODEL"   # this model's runs; the folds and the report are shared
+mkdir -p "$MODEL_DIR"
 mkdir -p "$EXP_DIR"
-LOG="$EXP_DIR/run_all.log"
+LOG="$MODEL_DIR/run_all.log"
 REPORT="${REPORT:-$EXP_DIR/report.md}"
-FINAL_CKPT="$EXP_DIR/finetune_multiview/models/final/best_model.ckpt"  # encoder for the fine-tuned embeddings
+FINAL_CKPT="$MODEL_DIR/finetune_multiview/models/final/best_model.ckpt"  # encoder for the fine-tuned embeddings
 
 say() { echo "$(date '+%Y-%m-%d %H:%M:%S')  $*" | tee -a "$LOG"; }
 die() { say "$*"; exit 1; }
 
 # The folds: made in the experiment the first time, then reused. --folds uses files from somewhere else.
 if [[ -z "$FOLDS" ]]; then
-    existing=("$EXP_DIR"/folds/*_cv_folds.npz)
+    existing=("$EXP_DIR"/folds/*_"$CV_METHOD"_cv_folds.npz)   # the method this experiment asked for
     if [[ -f "${existing[0]}" ]]; then
         FOLDS="${existing[0]}"
         say "Folds: $FOLDS (already made)"
@@ -110,9 +116,10 @@ if [[ -z "$FOLDS" ]]; then
         [[ -n "$TRAIN" ]] || die "This experiment has no folds yet: give --train (or --folds)"
         say "Making $CV_METHOD folds from $TRAIN"
         aircheck-bench make-folds --train "$TRAIN" --out "$EXP_DIR/folds" --method "$CV_METHOD" \
-            --smiles-col "$SMILES_COL" --label-col "$LABEL_COL" ${N_FOLDS:+--n-folds "$N_FOLDS"} \
+            --smiles-col "$SMILES_COL" --label-col "$LABEL_COL" --fingerprint-col "$FINGERPRINT_COL" \
+            ${N_FOLDS:+--n-folds "$N_FOLDS"} \
             >> "$LOG" 2>&1 || die "Making the folds failed; see $LOG"
-        existing=("$EXP_DIR"/folds/*_cv_folds.npz)
+        existing=("$EXP_DIR"/folds/*_"$CV_METHOD"_cv_folds.npz)
         FOLDS="${existing[0]}"
         say "Folds: $FOLDS"
     fi
@@ -142,12 +149,12 @@ else:
 path.write_text(json.dumps(now, indent=2) + "\n")
 PY
 
-say "Starting: ${#RUNS[@]} runs in $EXP_DIR (test $TEST)"
+say "Starting: ${#RUNS[@]} runs in $MODEL_DIR (test $TEST)"
 started=$(date +%s)
 for entry in "${RUNS[@]}"; do
     name="${entry%%|*}"
     read -r -a options <<< "${entry#*|}"
-    run_dir="$EXP_DIR/$name"
+    run_dir="$MODEL_DIR/$name"
 
     if [[ -n "$ONLY" && "$ONLY" != *",$name,"* ]] || [[ -n "$SKIP" && "$SKIP" == *",$name,"* ]]; then
         continue
@@ -177,7 +184,7 @@ if [[ "$REPORT" == "none" ]]; then
     say "All done in $((($(date +%s) - started) / 60)) min. No report asked for (--no-report)."
     exit 0
 fi
-if ! compgen -G "$EXP_DIR/*/run.json" > /dev/null; then
+if ! compgen -G "$EXP_DIR"/*/*/run.json > /dev/null && ! compgen -G "$EXP_DIR"/*/run.json > /dev/null; then
     say "No finished run in $EXP_DIR yet, so there is nothing to report."
     exit 0
 fi

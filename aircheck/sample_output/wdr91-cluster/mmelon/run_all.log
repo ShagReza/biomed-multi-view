@@ -1,5 +1,5 @@
 2026-01-01 00:00:00  Making cluster folds from ~/Datasets/wdr91/train.parquet
-2026-01-01 00:00:30  Starting: 12 runs in aircheck/output/wdr91-cluster
+2026-01-01 00:00:30  Starting: 12 runs in aircheck/output/wdr91-cluster/mmelon
 2026-01-01 00:00:30  finetune_multiview: run.py --method finetune
 2026-01-01 04:10:00  ... one line per run ...
 2026-01-01 06:00:00  All done in 360 min. Report: aircheck/output/wdr91-cluster/report.md
