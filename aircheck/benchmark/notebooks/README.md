@@ -4,7 +4,7 @@ The same work as `run_all.sh`, one step at a time, for exploring and explaining.
 every cell calls [../methods/](../methods/), [../run.py](../run.py) or aircheck-benchmark-core, so a notebook
 and a benchmark run can never drift apart.
 
-| Notebook | Step | Replaces, in [../../notebooks/](../../notebooks/) |
+| Notebook | Step | Replaces, in [../../archive-to-be-deleted/notebooks/](../../archive-to-be-deleted/notebooks/) |
 |---|---|---|
 | [01_folds.ipynb](01_folds.ipynb) | the experiment's cross-validation folds | `cluster_cv_folds.ipynb`, `stratified_cv.py` |
 | [02_finetune.ipynb](02_finetune.ipynb) | fine-tune MMELON (any view), score the test set | `MMELON*_finetuning*`, `MMELON*_inference*` |

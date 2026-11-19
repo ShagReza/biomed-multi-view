@@ -3,10 +3,10 @@ output/
 # Fold files that stratified_cv.py writes next to its input by default
 sample_data/cv_*
 # The repository's root .gitignore ignores *.sh; keep our notebook runner and the benchmark recipe
-!notebooks/run_notebook.sh
+!archive-to-be-deleted/notebooks/run_notebook.sh
 !benchmark/run_all.sh
 # Temporary copies run_recipe.py makes while a step runs
-notebooks/.recipe_*
+archive-to-be-deleted/notebooks/.recipe_*
 # Logs in the committed example output (the root .gitignore ignores *.log)
 !sample_output/**/*.log
 # Local API settings (may hold real paths); serving/.env.example is the committed template

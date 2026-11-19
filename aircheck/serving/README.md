@@ -1,7 +1,7 @@
 # MMELON prediction API
 
 A small web API that scores molecules (SMILES) with a fine-tuned MMELON model, so a website can request
-predictions. It reuses the inference logic of `../notebooks/MMELON_inference.ipynb`; no training code is included.
+predictions. It reuses the inference logic of `../archive-to-be-deleted/notebooks/MMELON_inference.ipynb`; no training code is included.
 
 | File | Purpose |
 |---|---|

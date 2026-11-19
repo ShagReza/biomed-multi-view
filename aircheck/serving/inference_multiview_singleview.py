@@ -1,6 +1,6 @@
 """Score molecules with a fine-tuned MMELON model: multi-view or single view (text, image or graph).
 
-Uses the same steps as the inference notebooks (../notebooks/MMELON_inference*.ipynb and
+Uses the same steps as the inference notebooks (../archive-to-be-deleted/notebooks/MMELON_inference*.ipynb and
 MMELON_singleview_inference*.ipynb), so the scores match them.
 
     from inference_multiview_singleview import load_model, predict

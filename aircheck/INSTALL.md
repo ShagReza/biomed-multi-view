@@ -7,7 +7,7 @@ To run the AIRCHECK notebooks:
    ```bash
    pip install -r aircheck/requirements-aircheck.txt
    ```
-3. Open a notebook in `aircheck/notebooks/` with that environment as the kernel, and run it from that folder (the default paths, like `../sample_data/train.parquet`, are relative to it).
+3. Open a notebook in `aircheck/archive-to-be-deleted/notebooks/` with that environment as the kernel, and run it from that folder (the default paths, like `../sample_data/train.parquet`, are relative to it).
 
 ## Troubleshooting: `pytorch-fast-transformers`
 

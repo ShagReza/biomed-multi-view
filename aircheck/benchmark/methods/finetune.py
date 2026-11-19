@@ -1,6 +1,6 @@
 """Fine-tune MMELON (multi-view, or one view: text, image or graph) for binary classification.
 
-The same training as ../../notebooks/MMELON_finetuning_cv.ipynb and MMELON_singleview_finetuning_cv.ipynb:
+The same training as ../../archive-to-be-deleted/notebooks/MMELON_finetuning_cv.ipynb and MMELON_singleview_finetuning_cv.ipynb:
 1. Train all folds side by side, one epoch at a time (up to `epochs`), scoring each fold's test rows after every
    epoch; average the metrics over the folds.
 2. Pick the epoch by `select_metrics` (first decides, later ones break ties); stop after `patience` epochs

@@ -1,6 +1,6 @@
 """LightGBM on MMELON embeddings (fused, text, image or graph).
 
-The same steps as ../../notebooks/MMELON_embedding_extraction.ipynb, MMELON_embedding_lgbm_cv.ipynb and
+The same steps as ../../archive-to-be-deleted/notebooks/MMELON_embedding_extraction.ipynb, MMELON_embedding_lgbm_cv.ipynb and
 MMELON_embedding_lgbm_inference.ipynb:
 1. Embed the training and test molecules with an MMELON encoder: the pretrained base model by default, or a
    fine-tuned checkpoint (`encoder`). All views come from one pass and are saved as parquet next to the runs

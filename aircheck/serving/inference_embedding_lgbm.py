@@ -1,7 +1,7 @@
 """Score molecules with LightGBM on MMELON embeddings (from MMELON_embedding_lgbm_cv.ipynb).
 
 Each SMILES is turned into the embedding view the LightGBM run was trained on (fused, text, image or graph), the same
-way as ../notebooks/MMELON_embedding_extraction.ipynb, and scored with the run's final LightGBM model
+way as ../archive-to-be-deleted/notebooks/MMELON_embedding_extraction.ipynb, and scored with the run's final LightGBM model
 (models/full.txt, trained on all training rows) or, with models="folds", the average of its CV fold models
 (as in MMELON_embedding_lgbm_inference.ipynb).
 

@@ -1,6 +1,6 @@
 """MMELON embeddings, saved as parquet and shared between runs.
 
-The same steps and file layout as ../../notebooks/MMELON_embedding_extraction.ipynb: all views come from one
+The same steps and file layout as ../../archive-to-be-deleted/notebooks/MMELON_embedding_extraction.ipynb: all views come from one
 pass of the encoder, and each view is written as parquet parts of `CHUNK_SIZE` molecules:
 
     <dir>/config.json                     encoder, data file, views, chunk size

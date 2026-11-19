@@ -6,7 +6,7 @@ computes the metrics and the report, the same way for every model in the benchma
 
 This folder is plain Python: `run_all.sh` → `run.py` → `methods/`. The notebooks in [notebooks/](notebooks/)
 do the same steps one at a time for exploring, and define no code of their own. The old notebooks in
-[../notebooks/](../notebooks/) are untouched and still work on their own.
+[../archive-to-be-deleted/notebooks/](../archive-to-be-deleted/notebooks/) are untouched and still work on their own.
 
 ## Setup
 
@@ -135,7 +135,7 @@ them last.
   logged during training, as in the notebooks.
 - **Folds and metrics** come from aircheck-benchmark-core instead of `cluster_cv_folds.ipynb` and the
   notebooks' `compute_metrics`; both give the same results.
-- **One folder per experiment** instead of `output/<dataset>/<run name>/` plus `report/report-<dataset>.md`.
+- **One folder per experiment** instead of `output/<dataset>/<run name>/` plus `archive-to-be-deleted/report/report-<dataset>.md`.
 - **Embeddings:** the same parquet files, but all four views come from one pass and are shared by the runs of
   an encoder, where the extraction notebook was run once per model and dataset.
 
