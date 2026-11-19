@@ -21,7 +21,7 @@ aircheck/
 │   └── test.parquet             # 1,031 molecules (31 actives): the final test set for the inference notebooks
 ├── benchmark/                   # benchmark runs: run_all.sh, run.py, methods/ and thin notebooks/
 ├── serving/                     # prediction API and its Docker image
-├── sample_output/               # example outputs of the old recipe (see the note below)
+├── sample_output/               # mock-up of what an experiment produces (made-up numbers)
 ├── archive-to-be-deleted/       # the old notebooks, their reports and recipe; replaced by benchmark/
 └── output/                      # experiments and runs; not tracked by git
 ```
@@ -41,14 +41,13 @@ aircheck/
 3. For your own data, give `--train` and `--test` your files and pick a new `--experiment` name.
 
 > **The old notebooks are in [archive-to-be-deleted/](archive-to-be-deleted/)** and still work on their own,
-> but they are no longer the way to run things and will be removed. `sample_output/` shows their output
-> layout, not the benchmark's.
+> but they are no longer the way to run things and will be removed.
 
 ## Example output
 
-`sample_output/sample-data/` holds the outputs of the **old** recipe on the sample data, with the
-[report](archive-to-be-deleted/report/report-sample-data.md). It shows the archived layout; the benchmark writes
-`output/<experiment>/` instead. It will be regenerated from a benchmark experiment when the archive is deleted.
+[sample_output/](sample_output/) is a mock-up of the folder a benchmark experiment produces: the layout, the
+file formats and an example report, with made-up numbers and the large files left out. A real experiment goes
+to `output/<experiment>/`, which git does not track.
 
 ## Class balancing
 

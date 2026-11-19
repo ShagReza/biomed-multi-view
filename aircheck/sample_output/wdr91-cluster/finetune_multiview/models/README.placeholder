@@ -1,0 +1,3 @@
+The real run writes the trained models here: fold_<i>/best_model.ckpt (~0.35 GB each) and final/best_model.ckpt,
+plus cv_metrics_per_epoch.csv (every fold and epoch) and selection.json (the chosen epoch).
+Left out of this mock-up because of their size.

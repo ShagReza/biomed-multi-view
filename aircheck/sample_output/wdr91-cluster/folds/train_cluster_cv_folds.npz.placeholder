@@ -1,0 +1,2 @@
+The real run writes train_cluster_cv_folds.npz here: the fold row indices
+(fold0_train, fold0_test, fold1_train, ...). Left out of this mock-up because it is binary.

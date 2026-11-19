@@ -1,0 +1,4 @@
+SMILES,LABEL,source_row
+CNCC1CCCN1S(=O)(=O)c1ccc(C)cc1Cl,0,0
+Cc1ccc(S(=O)(=O)CC(C)NC(=O)c2ccnn2C)cc1,0,1
+Cc1ccc(S(=O)(=O)NCC2CCCN2C)cc1Cl,1,2

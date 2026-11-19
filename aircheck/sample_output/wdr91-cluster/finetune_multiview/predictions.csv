@@ -1,0 +1,12 @@
+split,row,SMILES,LABEL,score
+fold0,6,CCOCC1CN(C(=O)Cc2nc(C3CC3)nn2C)CCO1,0,0.0121
+fold0,11,CCCN(CCC)C(=O)c1ccc(NC(=O)N2CCOCC2)cc1,0,0.3074
+fold0,58,Cc1ccc(S(=O)(=O)NCC2CCCN2C)cc1Cl,1,0.8412
+fold1,3,CNCC1CCCN1S(=O)(=O)c1ccc(C)cc1Cl,0,0.0456
+fold1,77,Cc1ccc(C(=O)NC2CCN(C)CC2)s1,1,0.7731
+test,0,CC(=O)Nc1ccc(O)cc1,0,0.0914
+test,1,c1ccc2[nH]ccc2c1,1,0.6628
+test,2,not_a_smiles,0,
+test_ensemble,0,CC(=O)Nc1ccc(O)cc1,0,0.1033
+test_ensemble,1,c1ccc2[nH]ccc2c1,1,0.7045
+test_ensemble,2,not_a_smiles,0,

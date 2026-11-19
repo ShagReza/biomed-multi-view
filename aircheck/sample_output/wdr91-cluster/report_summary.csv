@@ -1,0 +1,13 @@
+name,model,method,split,n,n_pos,n_unscored,hit@200,hit@100,hit@50,rocauc,pr_auc,precision,recall,specificity,accuracy
+MMELON fine-tuned (multiview),mmelon,finetune,fold0,30100,100,0,41,27,18,0.8413,0.2117,0.1234,0.5678,0.9012,0.8901
+MMELON fine-tuned (multiview),mmelon,finetune,fold1,30100,100,0,38,25,16,0.826,0.1984,0.1234,0.5678,0.9012,0.8901
+MMELON fine-tuned (multiview),mmelon,finetune,test,30000,95,0,35,22,15,0.8105,0.1902,0.1234,0.5678,0.9012,0.8901
+MMELON fine-tuned (multiview),mmelon,finetune,test_ensemble,30000,95,0,37,24,16,0.8221,0.2043,0.1234,0.5678,0.9012,0.8901
+MMELON fine-tuned (multiview),mmelon,finetune,cv_mean,30100,100,0,39.5,26.0,17.0,0.8337,0.2051,0.1234,0.5678,0.9012,0.8901
+MMELON fine-tuned (multiview),mmelon,finetune,cv_std,0,0,0,2.1,1.4,1.4,0.0108,0.0094,0.1234,0.5678,0.9012,0.8901
+LightGBM on MMELON fused embeddings (pretrained),mmelon,embed_lgbm,fold0,30100,100,0,41,27,18,0.8413,0.2117,0.1234,0.5678,0.9012,0.8901
+LightGBM on MMELON fused embeddings (pretrained),mmelon,embed_lgbm,fold1,30100,100,0,38,25,16,0.826,0.1984,0.1234,0.5678,0.9012,0.8901
+LightGBM on MMELON fused embeddings (pretrained),mmelon,embed_lgbm,test,30000,95,0,35,22,15,0.8105,0.1902,0.1234,0.5678,0.9012,0.8901
+LightGBM on MMELON fused embeddings (pretrained),mmelon,embed_lgbm,test_ensemble,30000,95,0,37,24,16,0.8221,0.2043,0.1234,0.5678,0.9012,0.8901
+LightGBM on MMELON fused embeddings (pretrained),mmelon,embed_lgbm,cv_mean,30100,100,0,39.5,26.0,17.0,0.8337,0.2051,0.1234,0.5678,0.9012,0.8901
+LightGBM on MMELON fused embeddings (pretrained),mmelon,embed_lgbm,cv_std,0,0,0,2.1,1.4,1.4,0.0108,0.0094,0.1234,0.5678,0.9012,0.8901

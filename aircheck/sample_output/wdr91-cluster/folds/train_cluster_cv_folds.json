@@ -1,0 +1,86 @@
+{
+  "core_version": "0.1.0",
+  "created": "2026-01-01T00:00:00",
+  "method": "cluster",
+  "settings": {
+    "n_folds": 5,
+    "n_clusters": 20,
+    "linkage": "average",
+    "test_pos_per_fold": 100,
+    "test_neg_fraction": 0.25,
+    "seed": 42
+  },
+  "train_file": "~/Datasets/wdr91/train.parquet",
+  "train_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "columns": {
+    "smiles": "SMILES",
+    "label": "LABEL",
+    "fingerprint": "ECFP4"
+  },
+  "nrows": null,
+  "n_rows": 120000,
+  "n_pos": 1800,
+  "n_folds": 5,
+  "folds": [
+    {
+      "fold": 0,
+      "train": 89000,
+      "test": 30100,
+      "train_pos": 1500,
+      "test_pos": 100,
+      "clusters": [
+        0,
+        10
+      ],
+      "held_out_pos": 60
+    },
+    {
+      "fold": 1,
+      "train": 89001,
+      "test": 30100,
+      "train_pos": 1500,
+      "test_pos": 100,
+      "clusters": [
+        1,
+        11
+      ],
+      "held_out_pos": 60
+    },
+    {
+      "fold": 2,
+      "train": 89002,
+      "test": 30100,
+      "train_pos": 1500,
+      "test_pos": 100,
+      "clusters": [
+        2,
+        12
+      ],
+      "held_out_pos": 60
+    },
+    {
+      "fold": 3,
+      "train": 89003,
+      "test": 30100,
+      "train_pos": 1500,
+      "test_pos": 100,
+      "clusters": [
+        3,
+        13
+      ],
+      "held_out_pos": 60
+    },
+    {
+      "fold": 4,
+      "train": 89004,
+      "test": 30100,
+      "train_pos": 1500,
+      "test_pos": 100,
+      "clusters": [
+        4,
+        14
+      ],
+      "held_out_pos": 60
+    }
+  ]
+}

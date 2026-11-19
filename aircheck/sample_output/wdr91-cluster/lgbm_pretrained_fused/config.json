@@ -1,0 +1,18 @@
+{
+  "view": "fused",
+  "embedding_model": "base: <the pretrained model>",
+  "lgbm_params_choice": "suggested",
+  "lgbm_params": {
+    "scale_pos_weight": 8,
+    "n_estimators": 3000,
+    "learning_rate": 0.02,
+    "num_leaves": 31,
+    "min_child_samples": 100,
+    "subsample": 0.7,
+    "subsample_freq": 1,
+    "colsample_bytree": 0.6,
+    "reg_alpha": 0.5,
+    "reg_lambda": 5.0
+  },
+  "embeddings_dir": "aircheck/output/wdr91-cluster/embeddings/pretrained"
+}

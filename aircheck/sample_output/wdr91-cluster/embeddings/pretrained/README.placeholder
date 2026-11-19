@@ -1,0 +1,4 @@
+The real run writes the embeddings here, as train/ and test/, each with config.json and one folder
+per view (fused, text, image, graph) holding part-00000.parquet, part-00001.parquet, ... with the columns
+row_index, smiles, embedding. Every run of the same encoder shares them. Left out of this mock-up
+because of their size (hundreds of MB).

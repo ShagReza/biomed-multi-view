@@ -1,0 +1,23 @@
+{
+  "model": "mmelon",
+  "method": "embed_lgbm",
+  "name": "LightGBM on MMELON fused embeddings (pretrained)",
+  "settings": {
+    "view": "fused",
+    "encoder": null,
+    "lgbm_params": "suggested",
+    "balance_classes": true,
+    "seed": 42,
+    "batch_size": 32
+  },
+  "report_extras": {},
+  "hardware": "Tesla T4",
+  "fork_commit": "0000000",
+  "core_version": "0.1.0",
+  "folds": "aircheck/output/wdr91-cluster/folds/train_cluster_cv_folds.npz",
+  "test": "~/Datasets/wdr91/test.parquet",
+  "paths": {
+    "embeddings": "aircheck/output/wdr91-cluster/embeddings/pretrained"
+  },
+  "created": "2026-01-01T00:00:00"
+}

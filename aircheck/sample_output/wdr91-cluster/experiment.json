@@ -1,0 +1,8 @@
+{
+  "experiment": "wdr91-cluster",
+  "train": "~/Datasets/wdr91/train.parquet",
+  "test": "~/Datasets/wdr91/test.parquet",
+  "cv_method": "cluster",
+  "folds": "aircheck/output/wdr91-cluster/folds/train_cluster_cv_folds.npz",
+  "created": "2026-01-01T00:00:00"
+}

@@ -1,0 +1,2 @@
+The real run writes the LightGBM models here: fold_<i>.txt per fold and full.txt for the model
+trained on all rows. Left out of this mock-up.

@@ -1,0 +1,3 @@
+2026-01-01 00:00:00  finetune: 120,000 training rows (1,800 actives), 5 folds; 30,000 test rows; device cuda
+2026-01-01 00:00:01  ... one line per step while the run goes on ...
+2026-01-01 00:00:02  Done. Scores (computed by aircheck-benchmark-core):
