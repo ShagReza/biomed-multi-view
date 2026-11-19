@@ -59,6 +59,21 @@ def _load_encoder(encoder_path: Path, device: str):
     return module.model.to(device).eval(), view
 
 
+def _find_base_model(run: Path) -> Path:
+    """The downloaded pretrained model, looked up above a run folder.
+
+    It sits in `aircheck/output/base_models/`, but a run folder is a different depth in the benchmark layout
+    (`output/<experiment>/<run>/`) than in the notebooks' (`output/<dataset>/lgbm/<run>/`), so search upward.
+    """
+    for parent in run.resolve().parents:
+        candidate = parent / "base_models" / BASE_MODEL_NAME
+        if candidate.is_dir():
+            return candidate
+    raise FileNotFoundError(
+        f"The pretrained model {BASE_MODEL_NAME} was not found in any base_models/ folder above {run}; "
+        "give encoder_path explicitly")
+
+
 def load_model(lgbm_run_dir, encoder_path=None, device=None, models="full") -> LoadedLgbmModel:
     """Load a LightGBM run and the MMELON encoder its embeddings came from.
 
@@ -82,8 +97,7 @@ def load_model(lgbm_run_dir, encoder_path=None, device=None, models="full") -> L
 
     if encoder_path is None:  # from the run's config: a checkpoint path, or "base: <Hugging Face ID>"
         recorded = config["embedding_model"]
-        encoder_path = (run.parents[2] / "base_models" / BASE_MODEL_NAME if recorded.startswith("base:")
-                        else recorded)
+        encoder_path = _find_base_model(run) if recorded.startswith("base:") else recorded
     encoder, encoder_view = _load_encoder(Path(encoder_path).expanduser(), device)
 
     view = config["view"]

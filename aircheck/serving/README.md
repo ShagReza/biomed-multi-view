@@ -1,14 +1,18 @@
 # MMELON prediction API
 
 A small web API that scores molecules (SMILES) with a fine-tuned MMELON model, so a website can request
-predictions. It reuses the inference logic of `../archive-to-be-deleted/notebooks/MMELON_inference.ipynb`; no training code is included.
+predictions. No training code is included.
+
+The two inference files here are the one place MMELON scoring is written down: the benchmark imports them
+(see [../benchmark/methods/common.py](../benchmark/methods/common.py)), so a benchmark score and an API score
+for the same molecule and model come from exactly the same code.
 
 | File | Purpose |
 |---|---|
 | `inference_multiview_singleview.py` | Scores SMILES with a fine-tuned MMELON model (multi-view or single view): the final model, or the CV fold models averaged. |
 | `inference_embedding_lgbm.py` | Scores SMILES with LightGBM on MMELON embeddings: the final model (`full.txt`) or the fold models. |
 | `api.py` | The web API (FastAPI): endpoints, request and response formats, errors. |
-| `requirements-serving.txt` | Extra packages for the API only (FastAPI, Uvicorn); not needed for the notebooks. |
+| `requirements-serving.txt` | Extra packages for the API only (FastAPI, Uvicorn); not needed to run the benchmark. |
 | `.env.example` | The settings the API reads (names with placeholder values). Copy to `.env` for local use. |
 | `models.example.json` | Example `MODELS_CONFIG`: one entry per target, with its model type and path. |
 | `Dockerfile` | Builds the CPU image that runs the API. |
@@ -22,23 +26,30 @@ Run them from this folder.
 
 | | Final model (default, `models="full"`) | CV fold models, averaged (`models="folds"`) |
 |---|---|---|
-| `inference_multiview_singleview.py` | the final model's folder (or its `best_model.ckpt`), e.g. `output/<DATASET>/finetuned/mmelon-final_<time>` | the CV run folder, e.g. `output/<DATASET>/mmelon-cv` |
+| `inference_multiview_singleview.py` | the folder holding `best_model.ckpt`, e.g. a benchmark run's `models/final` | the folder holding `fold_<i>/best_model.ckpt`, e.g. a benchmark run's `models` |
 | `inference_embedding_lgbm.py` | the LightGBM run folder (uses `models/full.txt`) | the same folder (uses `models/fold_*.txt`) |
+
+Paths below are benchmark runs, `output/<experiment>/<run name>/` (see
+[../benchmark/README.md](../benchmark/README.md)); a run made by the archived notebooks works the same way.
 
 ```python
 from inference_multiview_singleview import load_model, predict
-model = load_model("../output/sample-data/finetuned/mmelon-final_<time>")             # final model
-model = load_model("../output/sample-data/singleview-cv_text", models="folds")        # fold ensemble
+model = load_model("../output/wdr91-cluster/finetune_multiview/models/final")           # final model
+model = load_model("../output/wdr91-cluster/finetune_text/models", models="folds")      # fold ensemble
 predict(model, ["CCO", "c1ccccc1"])
 
 from inference_embedding_lgbm import load_model, predict
-model = load_model("../output/sample-data/lgbm/lgbm-text-finetuned",
-                   encoder_path="../output/sample-data/finetuned/mmelon-final_<time>")  # the MMELON model behind the embeddings
+model = load_model("../output/wdr91-cluster/lgbm_pretrained_fused")                     # pretrained embeddings
+model = load_model("../output/wdr91-cluster/lgbm_finetuned_fused",                      # fine-tuned embeddings
+                   encoder_path="../output/wdr91-cluster/finetune_multiview/models/final")
 predict(model, ["CCO", "c1ccccc1"])
 ```
 
 - The view (multi-view, text, image or graph; for LightGBM, fused, text, image or graph) is read from the saved model.
   `inference_multiview_singleview.load_model(..., view="text")` additionally checks it.
+- For LightGBM on **pretrained** embeddings, `encoder_path` can be left out: the base model is found in
+  `output/base_models/`. For **fine-tuned** embeddings, give the model the embeddings came from, or let it use
+  the path recorded in the run's `config.json`.
 - Folds are more accurate but K times slower and use K times the memory; the API uses the final model.
 - LightGBM runs made before the final model was added have only fold models: use `models="folds"`.
 

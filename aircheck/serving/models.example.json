@@ -1,17 +1,17 @@
 {
   "WDR91": {
     "type": "multiview_singleview",
-    "path": "/models/wdr91/mmelon-final",
+    "path": "/models/wdr91/finetune_multiview/models/final",
     "models": "full"
   },
   "WDR91-text": {
     "type": "multiview_singleview",
-    "path": "/models/wdr91/singleview-final_text",
+    "path": "/models/wdr91/finetune_text/models/final",
     "view": "text"
   },
   "WDR91-lgbm": {
     "type": "embedding_lgbm",
-    "path": "/models/wdr91/lgbm-text-finetuned",
-    "encoder_path": "/models/wdr91/mmelon-final"
+    "path": "/models/wdr91/lgbm_finetuned_fused",
+    "encoder_path": "/models/wdr91/finetune_multiview/models/final"
   }
 }
